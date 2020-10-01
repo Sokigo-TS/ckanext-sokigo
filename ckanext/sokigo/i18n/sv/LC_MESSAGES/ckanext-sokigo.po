@@ -32,7 +32,7 @@ msgid "Copy"
 msgstr "Kopiera"
 
 #: ckanext/sokigo/templates/package/resource_read.html:10
-msgid "Information about metadata"
+msgid "Information about resource"
 msgstr "Information om resurs"
 
 #: ckanext/sokigo/templates/package/snippets/additional_info.html:2
@@ -181,6 +181,7 @@ msgstr "Sammanfattning"
 msgid "eg. Some useful notes about the data"
 msgstr "t.ex. Några rader om datasetet"
 
+#: ckanext/sokigo/templates/package/snippets/tags.html:3
 #: ckanext/sokigo/templates/package/snippets/package_basic_fields.html:24
 msgid "Tags"
 msgstr "Nyckelord"
@@ -385,10 +386,6 @@ msgstr "Slutför"
 #: ckanext/sokigo/templates/package/snippets/resource_form.html:123
 msgid "Add"
 msgstr "Lägg till"
-
-#: ckanext/sokigo/templates/package/snippets/tags.html:3
-msgid "Tags"
-msgstr "Nyckelord"
 
 #: ckanext/sokigo/templates/snippets/custom_form_fields.html:20
 #: ckanext/sokigo/templates/snippets/custom_form_fields.html:37
