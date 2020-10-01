@@ -175,6 +175,7 @@ msgstr ""
 msgid "eg. Some useful notes about the data"
 msgstr ""
 
+#: ckanext/sokigo/templates/package/snippets/tags.html:3
 #: ckanext/sokigo/templates/package/snippets/package_basic_fields.html:24
 msgid "Tags"
 msgstr ""
@@ -375,10 +376,6 @@ msgstr ""
 
 #: ckanext/sokigo/templates/package/snippets/resource_form.html:123
 msgid "Add"
-msgstr ""
-
-#: ckanext/sokigo/templates/package/snippets/tags.html:3
-msgid "Tags"
 msgstr ""
 
 #: ckanext/sokigo/templates/snippets/custom_form_fields.html:20
