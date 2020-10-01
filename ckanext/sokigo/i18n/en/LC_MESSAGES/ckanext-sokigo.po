@@ -177,7 +177,7 @@ msgstr ""
 
 #: ckanext/sokigo/templates/package/snippets/package_basic_fields.html:24
 msgid "Tags"
-msgstr "Keywords"
+msgstr ""
 
 #: ckanext/sokigo/templates/package/snippets/package_basic_fields.html:24
 msgid "eg. economy, mental health, government"
@@ -378,7 +378,7 @@ msgid "Add"
 msgstr ""
 
 #: ckanext/sokigo/templates/package/snippets/tags.html:3
-msgid "Categories and keywords"
+msgid "Tags"
 msgstr ""
 
 #: ckanext/sokigo/templates/snippets/custom_form_fields.html:20

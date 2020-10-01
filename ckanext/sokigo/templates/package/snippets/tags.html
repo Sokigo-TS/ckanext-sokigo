@@ -1,6 +1,6 @@
 {% if tags %}
 {% block tags_title %}
-<h3> {{ _('Categories and keywords') }} </h3>
+<h3> {{ _('Tags') }} </h3>
 {% endblock %}
 <section class="tags">
     {% snippet 'snippets/tag_list.html', tags=tags, _class='tag-list well' %}
