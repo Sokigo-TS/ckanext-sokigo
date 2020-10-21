@@ -365,7 +365,7 @@ msgstr "t.ex. application/json"
 
 #: ckanext/sokigo/templates/package/snippets/resource_form.html:107
 msgid "Are you sure you want to delete this resource?"
-msgstr "Vill du verkligen radera denna grupp?"
+msgstr "Vill du verkligen radera denna resurs?"
 
 #: ckanext/sokigo/templates/package/snippets/resource_form.html:107
 msgid "Delete"
