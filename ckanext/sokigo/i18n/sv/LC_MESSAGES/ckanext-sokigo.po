@@ -219,11 +219,19 @@ msgid "Public"
 msgstr "Offentlig"
 
 #: ckanext/sokigo/templates/package/snippets/package_basic_fields.html:117
-msgid "active"
+msgid "Active"
 msgstr "Aktiv"
+
+#: ckanext/sokigo/templates/package/snippets/package_basic_fields.html:117
+msgid "active"
+msgstr "aktiv"
 
 #: ckanext/sokigo/templates/package/snippets/package_basic_fields.html:118
 msgid "deleted"
+msgstr "raderad"
+
+#: ckanext/sokigo/templates/package/snippets/package_basic_fields.html:118
+msgid "Deleted"
 msgstr "Raderad"
 
 #: ckanext/sokigo/templates/package/snippets/package_metadata_fields.html:6
