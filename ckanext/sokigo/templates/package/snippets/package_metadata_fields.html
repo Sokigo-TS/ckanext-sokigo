@@ -23,7 +23,7 @@
   {% endblock %}
 
   {% block package_metadata_fields_metadata_language %}
-    {{ form.input('metadata_language', label=_('Language of metadata'), id='field-metadata-language', placeholder=_('Language'), value=data.metadata_language, error=errors.metadata_language, classes=['control-medium']) }}
+    {{ form.input('metadata_language', label=_('Language of metadata'), id='field-metadata-language', placeholder=_('Language of metadata'), value=data.metadata_language, error=errors.metadata_language, classes=['control-medium']) }}
   {% endblock %}
 
   {% block package_metadata_fields_custom %}
