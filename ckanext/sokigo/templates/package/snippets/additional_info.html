@@ -74,6 +74,12 @@
             </td>
           </tr>
         {% endif %}
+        {% if pkg_dict.metadata_language %}
+          <tr>
+            <th scope="row" class="dataset-label">{{ _("Language of metadata") }}</th>
+            <td class="dataset-details">{{ pkg_dict.metadata_language }}</td>
+          </tr>
+        {% endif %}
 
       {% block extras scoped %}
         {% for extra in h.sorted_extras(pkg_dict.extras) %}
