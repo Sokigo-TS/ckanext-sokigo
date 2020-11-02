@@ -408,3 +408,26 @@ msgstr "Namn"
 msgid "Custom Value"
 msgstr "Värde"
 
+#: ckanext/sokigo
+msgid "bbox-east-long"
+msgstr "Öst"
+
+#: ckanext/sokigo
+msgid "bbox-north-lat"
+msgstr "Nord"
+
+#: ckanext/sokigo
+msgid "bbox-south-lat"
+msgstr "Syd"
+
+#: ckanext/sokigo
+msgid "bbox-west-long"
+msgstr "Väst"
+
+#: ckanext/sokigo
+msgid "frequency-of-update"
+msgstr "Uppdateringsfrekvens"
+
+#: ckanext/sokigo
+msgid "license"
+msgstr "Licens"
