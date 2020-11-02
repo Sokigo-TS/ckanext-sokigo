@@ -22,7 +22,7 @@ Example:
   <div class="col-md-6">
     <div class="input-group" {{ form.attributes(attrs) }}>
       <label for="{{ label_id }}" class="input-group-addon">{{ _('Key') }}</label>
-      <input class="form-control" id="{{ id or names[0] }}-key" type="text" name="{{ names[0] }}" value="{{ values[0] | empty_and_escape }}" placeholder="{{ placeholders[0] }}" />
+      <input class="form-control" id="{{ id or names[0] }}-key" type="text" name="{{ names[0] }}" value="{{ _(values[0]) | empty_and_escape }}" placeholder="{{ placeholders[0] }}" />
     </div>
   </div>
   <div class="col-md-6">
