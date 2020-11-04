@@ -50,6 +50,10 @@ class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
             'scale_factor': defaults,
             'z_min': defaults,
             'z_max': defaults,
+            'north': defaults,
+            'south': defaults,
+            'east': defaults,
+            'west': defaults,
         })
 
         return schema
