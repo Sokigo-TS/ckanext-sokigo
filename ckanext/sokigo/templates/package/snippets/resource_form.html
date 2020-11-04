@@ -82,6 +82,22 @@
     {% block basic_fields_z_max %}
       {{ form.input('z_max', id='field-z-max', label=_('Z-Max'), placeholder=_('z-max'), value=data.z_max, error=errors.z_max, classes=['control-full']) }}
     {% endblock %}
+  
+    {% block basic_fields_north %}
+      {{ form.input('north', id='field-north', label=_('North'), placeholder=_('north'), value=data.north, error=errors.north, classes=['control-full']) }}
+    {% endblock %}
+  
+    {% block basic_fields_south %}
+      {{ form.input('south', id='field-south', label=_('South'), placeholder=_('south'), value=data.south, error=errors.south, classes=['control-full']) }}
+    {% endblock %}
+  
+    {% block basic_fields_east %}
+      {{ form.input('east', id='field-east', label=_('East'), placeholder=_('east'), value=data.east, error=errors.east, classes=['control-full']) }}
+    {% endblock %}
+  
+    {% block basic_fields_west %}
+      {{ form.input('west', id='field-west', label=_('West'), placeholder=_('west'), value=data.west, error=errors.west, classes=['control-full']) }}
+    {% endblock %}
 
   {% endblock basic_fields %}
 
