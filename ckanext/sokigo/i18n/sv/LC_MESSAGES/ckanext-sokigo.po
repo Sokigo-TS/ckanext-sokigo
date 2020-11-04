@@ -433,10 +433,6 @@ msgid "license"
 msgstr "Licens"
 
 #: ckanext/sokigo
-msgid "bbox-east-long"
-msgstr "Öst"
-
-#: ckanext/sokigo
 msgid "North"
 msgstr "Nord"
 
