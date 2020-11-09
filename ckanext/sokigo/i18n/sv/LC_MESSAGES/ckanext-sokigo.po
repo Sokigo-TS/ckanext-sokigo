@@ -445,6 +445,10 @@ msgid "West"
 msgstr "Väst"
 
 #: ckanext/sokigo
+msgid "East"
+msgstr "Öst"
+
+#: ckanext/sokigo
 msgid "Has views"
 msgstr "Vyer finns"
 
@@ -460,4 +464,30 @@ msgstr "Språk i resurs"
 msgid "Revision id"
 msgstr "Revision Id"
 
+#: ckanext/sokigo
+msgid "Contact email"
+msgstr "E-post till kontakt"
 
+#: ckanext/sokigo
+msgid "Contact name"
+msgstr "Resurskontakt"
+
+#: ckanext/sokigo
+msgid "contact_organization"
+msgstr "Kontakt organisation"
+
+#: ckanext/sokigo
+msgid "metadata-date"
+msgstr "Metadata datum"
+
+#: ckanext/sokigo
+msgid "resource-type"
+msgstr "Resurs typ"
+
+#: ckanext/sokigo
+msgid "responsible-party"
+msgstr "Ansvarig organisation"
+
+#: ckanext/sokigo
+msgid "spatial"
+msgstr "Geografiskt område"
