@@ -23,6 +23,9 @@ class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
         map.connect('copy', '/dataset/copy/{id}',
                     controller='ckanext.sokigo.controller:CopyController',
                     action='copy')
+        map.connect('copy_resources', '/dataset/copy/{id}/resources',
+                    controller='ckanext.sokigo.controller:CopyController',
+                    action='copy_resources')
 
         return map
 

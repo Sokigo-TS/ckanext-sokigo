@@ -33,7 +33,16 @@
     {{ super() }}
 
     {% if h.check_access('package_update', {'id':pkg.id }) %}
-        {% link_for _('Copy'), controller='ckanext.sokigo.controller:CopyController', action='copy', id=pkg.name, class_='btn btn-success', icon='copy' %}
+        <div class="btn-group">
+            <a class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                <i class="fa fa-copy"></i> {{ _('Copy') }}
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a href="{{h.url_for(controller='ckanext.sokigo.controller:CopyController', action='copy_resources', id=pkg.id)}}" class="btn"><i class="fa fa-files-o"></i> {{ _('with resources') }}</a></li>
+                <li><a href="{{h.url_for(controller='ckanext.sokigo.controller:CopyController', action='copy', id=pkg.id)}}" class="btn"><i class="fa fa-ban"></i> {{ _('without resources') }}</a></li>
+            </ul>
+        </div>
     {% endif %}
 
 {% endblock %}
