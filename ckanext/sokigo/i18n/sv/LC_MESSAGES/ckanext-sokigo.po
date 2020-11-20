@@ -491,3 +491,11 @@ msgstr "Ansvarig organisation"
 #: ckanext/sokigo
 msgid "spatial"
 msgstr "Geografiskt område"
+
+#: ckanext/sokigo
+msgid "with resources"
+msgstr "med resurser"
+
+#: ckanext/sokigo
+msgid "without resources"
+msgstr "utan resurser"
