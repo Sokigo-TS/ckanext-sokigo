@@ -537,8 +537,16 @@ msgid "Copy dataset with resources"
 msgstr "Kopiera dataset med resurser"
 
 #: ckanext/sokigo
+msgid "Copy dataset without resources"
+msgstr "Kopiera dataset utan resurser"
+
+#: ckanext/sokigo
 msgid "Copy of"
 msgstr "Kopia av"
+
+#: ckanext/sokigo
+msgid "-copy"
+msgstr "-kopia"
 
 #: ckanext/sokigo
 msgid "(same as dataset)"
@@ -549,8 +557,16 @@ msgid "Filter by location"
 msgstr "Filtrera med karta"
 
 #: unknown
+msgid "Draw a rectangle"
+msgstr "Rita en rektangel"
+
+#: unknown
 msgid "Search datasets..."
-msgstr "Sök dataset här"
+msgstr "Sök dataset..."
+
+#: unknown
+msgid "Dataset extent"
+msgstr "Dataset område"
 
 #: unknown
 msgid "Your profile lets other CKAN users know about who you are and what you do."

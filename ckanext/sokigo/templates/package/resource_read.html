@@ -65,7 +65,7 @@
             {% endif %}
 
               {% for key, value in h.format_resource_items(res.items()) %}
-                {% if key not in ('format', 'has views', 'id', 'package id', 'revision id', 'state', 'resource owner', 'resource owner email', 'resource contact', 'resource contact email', 'north', 'south', 'east', 'west') %}
+                {% if key not in ('format', 'has views', 'id', 'package id', 'revision id', 'state', 'resource license id', 'resource owner', 'resource owner email', 'resource contact', 'resource contact email', 'north', 'south', 'east', 'west') %}
                   <tr><th scope="row">{{ _(key | capitalize) }}</th><td>{{ value }}</td></tr>
                 {% endif %}
               {% endfor %}

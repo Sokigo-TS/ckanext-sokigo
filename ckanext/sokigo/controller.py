@@ -45,8 +45,8 @@ class CopyController(PackageController):
         if data is None:
             data = t.get_action('package_show')(None, {'id': id})
             # generate new unused package name
-            data['title'] = 'Copy of {0}'.format(data['title'])
-            data['name'] = '{}-copy'.format(data['name'])
+            data['title'] = '{} {}'.format(t._('Copy of'), data['title'])
+            data['name'] = '{}{}'.format(data['name'],t._('-copy'))
             while True:
                 try:
                     _ = t.get_action('package_show')(None, {'name_or_id': data['name']})
@@ -54,7 +54,7 @@ class CopyController(PackageController):
                     break
                 else:
                     import random
-                    data['name'] = '{}-copy-{}'.format(data['name'], random.randint(1, 100))
+                    data['name'] = '{}{}-{}'.format(data['name'], t._('-copy'), random.randint(1, 100))
 
             # remove unnecessary attributes from the dataset
             remove_attrs = ['id', 'revision_id', 'metadata_created', 'metadata_modified', 'revision_timestamp']
@@ -72,15 +72,6 @@ class CopyController(PackageController):
 
             c.resources_json = h.json.dumps(resources)
 
-        form_snippet = 'package/copy_package_form.html'
-        c.form_action = t.url_for(controller='ckanext.sokigo.controller:CopyController', action='copy_resources', id=id)
-
-        if context['save'] and t.request.method == 'POST':
-            data = clean_dict(dict_fns.unflatten(tuplize_dict(parse_params(
-                t.request.POST, ignore_keys=CACHE_PARAMETERS))))
-
-            data['resources'] = resources
-
             # convert tags if not supplied in data
             if data and not data.get('tag_string'):
                 data['tag_string'] = ', '.join(
@@ -90,6 +81,15 @@ class CopyController(PackageController):
             # set automatically
             data['group_id'] = t.request.params.get('group') or \
                                t.request.params.get('groups__0__id')
+
+        form_snippet = 'package/copy_package_form.html'
+        c.form_action = t.url_for(controller='ckanext.sokigo.controller:CopyController', action='copy_resources', id=id)
+
+        if context['save'] and t.request.method == 'POST':
+            data = clean_dict(dict_fns.unflatten(tuplize_dict(parse_params(
+                t.request.POST, ignore_keys=CACHE_PARAMETERS))))
+
+            data['resources'] = resources
 
             try:
                 pkg_dict = t.get_action('package_create')(context, data)
@@ -155,7 +155,7 @@ class CopyController(PackageController):
         data = t.get_action('package_show')(None, data_dict)
 
         # change dataset title and name
-        data['name'] = '{}-copy'.format(data['name'])
+        data['name'] = '{}{}'.format(data['name'], t._('-copy'))
         while True:
             try:
                 _pkg = t.get_action('package_show')(None, {'name_or_id': data['name']})
@@ -163,9 +163,9 @@ class CopyController(PackageController):
                 break
             else:
                 import random
-                data['name'] = '{}-copy-{}'.format(data['name'], random.randint(1, 100))
+                data['name'] = '{}{}-{}'.format(data['name'], t._('-copy'), random.randint(1, 100))
 
-        data['title'] = 'Copy of {0}'.format(data['title'])
+        data['title'] = '{} {}'.format(t._('Copy of'), data['title'])
 
         # remove unnecessary attributes from the dataset
         remove_attrs = ['id', 'revision_id', 'metadata_created', 'metadata_modified',
