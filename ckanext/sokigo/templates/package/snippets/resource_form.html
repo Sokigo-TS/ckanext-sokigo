@@ -52,6 +52,7 @@
           <div class="row">
             <div class="col-md-6">
               <select id="field-license" name="resource_license_id" data-module="autocomplete">
+                <option value=""></option>
                 {% set existing_license_id = data.get('resource_license_id') %}
                 {% for license_id, license_desc in h.license_options(existing_license_id) %}
                 <option value="{{ license_id }}" {% if existing_license_id == license_id %}selected="selected"{% endif %}>{{ license_desc }}</option>

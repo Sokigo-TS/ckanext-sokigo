@@ -529,5 +529,5 @@ msgid "Resource locator function"
 msgstr "Resursåtkomstsätt"
 
 #: ckanext/sokigo
-msgid "Resource locator protokoll"
+msgid "Resource locator protocol"
 msgstr "Resursåtkomstprotokoll"
