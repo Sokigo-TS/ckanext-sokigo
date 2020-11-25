@@ -482,7 +482,7 @@ msgstr "Metadata datum"
 
 #: ckanext/sokigo
 msgid "resource-type"
-msgstr "Resurs typ"
+msgstr "Resurstyp"
 
 #: ckanext/sokigo
 msgid "responsible-party"
@@ -515,3 +515,19 @@ msgstr "Resurskontakt"
 #: ckanext/sokigo
 msgid "Resource Contact Email"
 msgstr "E-post till resurskontakt"
+
+#: ckanext/sokigo
+msgid "Resource License (if different from dataset)"
+msgstr "Licens för resurs (om ej samma som dataset)"
+
+#: ckanext/sokigo
+msgid "Dataset License"
+msgstr "Licens för dataset"
+
+#: ckanext/sokigo
+msgid "Resource locator function"
+msgstr "Resursåtkomstsätt"
+
+#: ckanext/sokigo
+msgid "Resource locator protokoll"
+msgstr "Resursåtkomstprotokoll"

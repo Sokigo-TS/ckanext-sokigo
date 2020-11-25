@@ -21,9 +21,24 @@
                 <td>{{ res.format or res.mimetype_inner or res.mimetype or _('unknown') }}</td>
               </tr>
               <tr>
-                <th scope="row">{{ _('License') }}</th>
+                <th scope="row">{{ _('Dataset License') }}</th>
                 <td>{% snippet "snippets/license.html", pkg_dict=pkg, text_only=True %}</td>
               </tr>
+              
+            {% if res.resource_license_id %}
+              <tr>
+                <th scope="row" class="dataset-label">{{ _("Resource License (if different from dataset)") }}</th>
+                <td>
+                    {% set resource_license_text = 'notspecified' %}
+                    {% for license_id, license_desc in h.license_options(res.resource_license_id) %}
+                        {% if res.resource_license_id == license_id %}
+                            {% set resource_license_text = license_desc %}
+                        {% endif %}
+                    {% endfor %}
+                    {{ resource_license_text }}
+                </td>
+              </tr>
+            {% endif %}
 			  
             {% if res.resource_owner_email %}
               <tr>
@@ -50,7 +65,7 @@
             {% endif %}
 
               {% for key, value in h.format_resource_items(res.items()) %}
-                {% if key not in ('format', 'has views', 'id', 'package id', 'revision id', 'status', 'resource owner', 'resource owner email', 'resource contact', 'resource contact email', 'north', 'south', 'east', 'west') %}
+                {% if key not in ('format', 'has views', 'id', 'package id', 'revision id', 'state', 'resource owner', 'resource owner email', 'resource contact', 'resource contact email', 'north', 'south', 'east', 'west') %}
                   <tr><th scope="row">{{ _(key | capitalize) }}</th><td>{{ value }}</td></tr>
                 {% endif %}
               {% endfor %}
@@ -84,7 +99,7 @@
             {% endif %}
 
               {% for key, value in h.format_resource_items(res.items()) %}
-                {% if key in ('has views', 'id', 'package id', 'revision id', 'status') %}
+                {% if key in ('has views', 'id', 'package id', 'revision id', 'state') %}
                   <tr class="toggle-more"><th scope="row">{{ _(key | capitalize) }}</th><td>{{ value }}</td></tr>
                 {% endif %}
               {% endfor %}
