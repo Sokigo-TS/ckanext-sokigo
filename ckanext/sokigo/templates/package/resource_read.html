@@ -29,15 +29,11 @@
               <tr>
                 <th scope="row" class="dataset-label">{{ _("Resource License (if different from dataset)") }}</th>
                 <td>
-                    {% set resource_license_text = res.resource_license_id %}
                     {% for license_id, license_desc in h.license_options(res.resource_license_id) %}
-                        {{ license_id }}
-                        {{ license_desc }}
-                        {% if res.resource_license_id == license_id %}
-                            {% set resource_license_text = license_desc %}
+                        {% if license_id == res.resource_license_id %}
+                            {{ license_desc }}
                         {% endif %}
                     {% endfor %}
-                    {{ resource_license_text }}
                 </td>
               </tr>
             {% endif %}
