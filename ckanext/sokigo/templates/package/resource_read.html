@@ -24,8 +24,33 @@
                 <th scope="row">{{ _('License') }}</th>
                 <td>{% snippet "snippets/license.html", pkg_dict=pkg, text_only=True %}</td>
               </tr>
+			  
+            {% if res.resource_owner_email %}
+              <tr>
+                <th scope="row" class="dataset-label">{{ _("Resource Owner") }}</th>
+                <td>{{ h.mail_to(email_address=res.resource_owner_email, name=res.resource_owner) }}</td>
+              </tr>
+            {% elif res.resource_owner %}
+              <tr>
+                <th scope="row" class="dataset-label">{{ _("Resource Owner") }}</th>
+                <td>{{ res.resource_owner }}</td>
+              </tr>
+            {% endif %}
+
+            {% if res.resource_contact_email %}
+              <tr>
+                <th scope="row" class="dataset-label">{{ _("Resource Contact") }}</th>
+                <td>{{ h.mail_to(email_address=res.resource_contact_email, name=res.resource_contact) }}</td>
+              </tr>
+            {% elif res.resource_contact %}
+              <tr>
+                <th scope="row" class="dataset-label">{{ _("Resource Contact") }}</th>
+                <td>{{ res.resource_contact }}</td>
+              </tr>
+            {% endif %}
+		
               {% for key, value in h.format_resource_items(res.items()) %}
-                {% if key not in ('format', 'has views', 'id', 'package id', 'revision id') %}
+                {% if key not in ('format', 'has views', 'id', 'package id', 'revision id', 'resource_owner', 'resource_owner_email', 'resource_contact', 'resource_contact_email') %}
                   <tr><th scope="row">{{ _(key | capitalize) }}</th><td>{{ value }}</td></tr>
                 {% endif %}
               {% endfor %}

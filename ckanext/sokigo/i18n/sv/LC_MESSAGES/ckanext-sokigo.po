@@ -499,3 +499,19 @@ msgstr "med resurser"
 #: ckanext/sokigo
 msgid "without resources"
 msgstr "utan resurser"
+
+#: ckanext/sokigo
+msgid "Resource Owner"
+msgstr "Resursägare"
+
+#: ckanext/sokigo
+msgid "Resource Owner Email"
+msgstr "E-post till resursägare"
+
+#: ckanext/sokigo
+msgid "Resource Contact"
+msgstr "Resurskontakt"
+
+#: ckanext/sokigo
+msgid "Resource Contact Email"
+msgstr "E-post till resurskontakt"

@@ -48,6 +48,22 @@
       {{ form.input('resource_language', id='field-resource-language', label=_('Language of resource'), placeholder=_('Language of resource'), value=data.resource_language, error=errors.resource_language, classes=['control-full']) }}
     {% endblock %}
 
+    {% block basic_fields_resource_owner %}
+      {{ form.input('resource_owner', id='field-resource-owner', label=_('Resource Owner'), placeholder=_('Resource Owner'), value=data.resource_owner, error=errors.resource_owner, classes=['control-full']) }}
+    {% endblock %}
+
+    {% block basic_fields_resource_owner_email %}
+      {{ form.input('resource_owner_email', id='field-resource-owner-email', label=_('Resource Owner Email'), placeholder=_('Resource Owner Email'), value=data.resource_owner_email, error=errors.resource_owner_email, classes=['control-full']) }}
+    {% endblock %}
+
+    {% block basic_fields_resource_contact %}
+      {{ form.input('resource_contact', id='field-resource-contact', label=_('Resource Contact'), placeholder=_('Resource Contact'), value=data.resource_contact, error=errors.resource_contact, classes=['control-full']) }}
+    {% endblock %}
+
+    {% block basic_fields_resource_contact_email %}
+      {{ form.input('resource_contact_email', id='field-resource-contact-email', label=_('Resource Contact Email'), placeholder=_('Resource Contact Email'), value=data.resource_contact_email, error=errors.resource_contact_email, classes=['control-full']) }}
+    {% endblock %}
+
     {% block basic_fields_completeness %}
       {{ form.input('completeness', id='field-completeness', label=_('Completeness'), placeholder=_('Completeness'), value=data.completeness, error=errors.completeness, classes=['control-full']) }}
     {% endblock %}
