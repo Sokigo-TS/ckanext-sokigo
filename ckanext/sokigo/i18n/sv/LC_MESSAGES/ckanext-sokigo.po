@@ -517,8 +517,8 @@ msgid "Resource Contact Email"
 msgstr "E-post till resurskontakt"
 
 #: ckanext/sokigo
-msgid "Resource License (if different from dataset)"
-msgstr "Licens för resurs (om ej samma som dataset)"
+msgid "Resource License"
+msgstr "Licens för resurs"
 
 #: ckanext/sokigo
 msgid "Dataset License"
@@ -531,3 +531,31 @@ msgstr "Resursåtkomstsätt"
 #: ckanext/sokigo
 msgid "Resource locator protocol"
 msgstr "Resursåtkomstprotokoll"
+
+#: ckanext/sokigo
+msgid "Copy dataset with resources"
+msgstr "Kopiera dataset med resurser"
+
+#: ckanext/sokigo
+msgid "Copy of"
+msgstr "Kopia av"
+
+#: ckanext/sokigo
+msgid "(same as dataset)"
+msgstr "(samma som dataset)"
+
+#: unknown
+msgid "Filter by location"
+msgstr "Filtrera med karta"
+
+#: unknown
+msgid "Search datasets..."
+msgstr "Sök dataset här"
+
+#: unknown
+msgid "Your profile lets other CKAN users know about who you are and what you do."
+msgstr "Genom din profil kan andra CKAN användare få information om vem du är och vad du gör."
+
+#: unknown
+msgid "As a sysadmin user you have full control over this CKAN instance. Proceed with care!"
+msgstr "Som sysadmin användare har du full behörighet i denna CKAN instans. Fortsätt med försiktighet!"

@@ -25,9 +25,9 @@
                 <td>{% snippet "snippets/license.html", pkg_dict=pkg, text_only=True %}</td>
               </tr>
               
-            {% if res.resource_license_id %}
               <tr>
-                <th scope="row" class="dataset-label">{{ _("Resource License (if different from dataset)") }}</th>
+                <th scope="row" class="dataset-label">{{ _("Resource License") }}</th>
+                {% if res.resource_license_id %}
                 <td>
                     {% for license_id, license_desc in h.license_options(res.resource_license_id) %}
                         {% if license_id == res.resource_license_id %}
@@ -35,8 +35,10 @@
                         {% endif %}
                     {% endfor %}
                 </td>
+                {% else %}
+                <td>{{ _("(same as dataset)") }}</td>
+                {% endif %}
               </tr>
-            {% endif %}
 			  
             {% if res.resource_owner_email %}
               <tr>
