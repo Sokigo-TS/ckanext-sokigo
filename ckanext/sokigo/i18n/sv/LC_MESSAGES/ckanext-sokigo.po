@@ -561,8 +561,8 @@ msgid "Draw a rectangle"
 msgstr "Rita en rektangel"
 
 #: unknown
-msgid "Search datasets..."
-msgstr "Sök dataset..."
+msgid "Search datasets"
+msgstr "Sök i dataset"
 
 #: unknown
 msgid "Dataset extent"
