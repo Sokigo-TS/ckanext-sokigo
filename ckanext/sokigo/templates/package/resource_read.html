@@ -48,14 +48,43 @@
                 <td>{{ res.resource_contact }}</td>
               </tr>
             {% endif %}
-		
+
               {% for key, value in h.format_resource_items(res.items()) %}
-                {% if key not in ('format', 'has views', 'id', 'package id', 'revision id', 'resource_owner', 'resource_owner_email', 'resource_contact', 'resource_contact_email') %}
+                {% if key not in ('format', 'has views', 'id', 'package id', 'revision id', 'status', 'resource owner', 'resource owner email', 'resource contact', 'resource contact email', 'north', 'south', 'east', 'west') %}
                   <tr><th scope="row">{{ _(key | capitalize) }}</th><td>{{ value }}</td></tr>
                 {% endif %}
               {% endfor %}
+
+            {% if res.north %}
+              <tr>
+                <th scope="row" class="dataset-label">{{ _("North") }}</th>
+                <td>{{ res.north }}</td>
+              </tr>
+            {% endif %}
+
+            {% if res.south %}
+              <tr>
+                <th scope="row" class="dataset-label">{{ _("South") }}</th>
+                <td>{{ res.south }}</td>
+              </tr>
+            {% endif %}
+
+            {% if res.east %}
+              <tr>
+                <th scope="row" class="dataset-label">{{ _("East") }}</th>
+                <td>{{ res.east }}</td>
+              </tr>
+            {% endif %}
+
+            {% if res.west %}
+              <tr>
+                <th scope="row" class="dataset-label">{{ _("West") }}</th>
+                <td>{{ res.west }}</td>
+              </tr>
+            {% endif %}
+
               {% for key, value in h.format_resource_items(res.items()) %}
-                {% if key in ('has views', 'id', 'package id', 'revision id') %}
+                {% if key in ('has views', 'id', 'package id', 'revision id', 'status') %}
                   <tr class="toggle-more"><th scope="row">{{ _(key | capitalize) }}</th><td>{{ value }}</td></tr>
                 {% endif %}
               {% endfor %}
