@@ -562,7 +562,7 @@ msgstr "Rita en rektangel"
 
 #: unknown
 msgid "Search datasets"
-msgstr "Sök i dataset"
+msgstr "Sök dataset"
 
 #: unknown
 msgid "Dataset extent"
