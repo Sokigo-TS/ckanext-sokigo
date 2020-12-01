@@ -180,9 +180,9 @@
             {% endif %}
 
             {# All other fields, directly visible #}
-              {% for key, value in h.format_resource_items(res.items()) %}
-                {% if key not in ('has views', 'id', 'package id', 'revision id', 'state', 'format', 'metadata created', 'created', 'last modified', 'resource license id', 'resource language', 'resource owner', 'resource owner email', 'resource contact', 'resource contact email', 'north', 'south', 'east', 'west', 'classification', 'completeness', 'update frequency', 'coordinate system', 'area', 'scale_factor', 'z min', 'z max') %}
-                  <tr><th scope="row">{{ _(key | capitalize) }}</th><td data-raw-key="{{ key }}">{{ _(value) }}</td></tr>
+              {% for key, value in res.items() %}
+                {% if key not in ('has_views', 'id', 'package_id', 'revision_id', 'state', 'format', 'metadata_created', 'created', 'last_modified', 'resource_license_id', 'resource_language', 'resource_owner', 'resource_owner_email', 'resource_contact', 'resource_contact_email', 'north', 'south', 'east', 'west', 'classification', 'completeness', 'update_frequency', 'coordinate_system', 'area', 'scale_factor', 'z_min', 'z_max') %}
+                  <tr><th scope="row">{{ key }}</th><td data-raw-key="{{ key }}">{{ value }}</td></tr>
                 {% endif %}
               {% endfor %}
 
