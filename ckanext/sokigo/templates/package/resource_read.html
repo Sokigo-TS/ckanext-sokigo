@@ -20,26 +20,14 @@
                 <th scope="row">{{ _('Format') }}</th>
                 <td>{{ res.format or res.mimetype_inner or res.mimetype or _('unknown') }}</td>
               </tr>
+
+			{% if res.resource_language %}
               <tr>
-                <th scope="row">{{ _('Dataset License') }}</th>
-                <td>{% snippet "snippets/license.html", pkg_dict=pkg, text_only=True %}</td>
+                <th scope="row" class="dataset-label">{{ _('Language of resource') }}</th>
+                <td>{{ res.resource_language }}</td>
               </tr>
-              
-              <tr>
-                <th scope="row" class="dataset-label">{{ _("Resource License") }}</th>
-                {% if res.resource_license_id %}
-                <td>
-                    {% for license_id, license_desc in h.license_options(res.resource_license_id) %}
-                        {% if license_id == res.resource_license_id %}
-                            {{ license_desc }}
-                        {% endif %}
-                    {% endfor %}
-                </td>
-                {% else %}
-                <td>{{ _("(same as dataset)") }}</td>
-                {% endif %}
-              </tr>
-			  
+            {% endif %}
+
             {% if res.resource_owner_email %}
               <tr>
                 <th scope="row" class="dataset-label">{{ _("Resource Owner") }}</th>
@@ -63,12 +51,70 @@
                 <td>{{ res.resource_contact }}</td>
               </tr>
             {% endif %}
-
-              {% for key, value in h.format_resource_items(res.items()) %}
-                {% if key not in ('format', 'has views', 'id', 'package id', 'revision id', 'state', 'resource license id', 'resource owner', 'resource owner email', 'resource contact', 'resource contact email', 'north', 'south', 'east', 'west') %}
-                  <tr><th scope="row">{{ _(key | capitalize) }}</th><td>{{ value }}</td></tr>
+			  
+              <tr>
+                <th scope="row" class="dataset-label">{{ _("Resource License") }}</th>
+                {% if res.resource_license_id %}
+                <td>
+                    {% for license_id, license_desc in h.license_options(res.resource_license_id) %}
+                        {% if license_id == res.resource_license_id %}
+                            {{ license_desc }}
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                {% else %}
+                <td>{% snippet "snippets/license.html", pkg_dict=pkg, text_only=True %} {{ _("(same as dataset)") }}</td>
                 {% endif %}
-              {% endfor %}
+              </tr>
+
+			{% if res.classification %}
+              <tr>
+                <th scope="row" class="dataset-label">{{ _('Classification') }}</th>
+                <td>{{ res.classification }}</td>
+              </tr>
+            {% endif %}
+
+			{% if res.completeness %}
+              <tr>
+                <th scope="row" class="dataset-label">{{ _('Completeness') }}</th>
+                <td>{{ res.completeness }}</td>
+              </tr>
+            {% endif %}
+
+			{% if res.update_frequency %}
+              <tr>
+                <th scope="row" class="dataset-label">{{ _('update frequency') }}</th>
+                <td>{{ res.update_frequency }}</td>
+              </tr>
+            {% endif %}
+
+			{% if res.created %}
+              <tr>
+                <th scope="row" class="dataset-label">{{ _('Created') }}</th>
+                <td>{{ h.render_datetime(res.created, with_hours=True) }}</td>
+              </tr>
+            {% endif %}
+
+			{% if res.last_modified %}
+              <tr>
+                <th scope="row" class="dataset-label">{{ _('Last Modified') }}</th>
+                <td>{{ h.render_datetime(res.last_modified, with_hours=True) }}</td>
+              </tr>
+            {% endif %}
+			  
+			{% if res.coordinate_system %}
+              <tr>
+                <th scope="row" class="dataset-label">{{ _('coordinate system') }}</th>
+                <td>{{ res.coordinate_system }}</td>
+              </tr>
+            {% endif %}
+
+			{% if res.area %}
+              <tr>
+                <th scope="row" class="dataset-label">{{ _('Area') }}</th>
+                <td>{{ res.area }}</td>
+              </tr>
+            {% endif %}
 
             {% if res.north %}
               <tr>
@@ -98,11 +144,50 @@
               </tr>
             {% endif %}
 
+            {% if res.scale_factor %}
+              <tr>
+                <th scope="row" class="dataset-label">{{ _('Scale factor') }}</th>
+                <td>{{ res.scale_factor }}</td>
+              </tr>
+            {% endif %}
+
+            {% if res.z_min %}
+              <tr>
+                <th scope="row" class="dataset-label">{{ _('z-min') }}</th>
+                <td>{{ res.z_min }}</td>
+              </tr>
+            {% endif %}
+
+            {% if res.z_max %}
+              <tr>
+                <th scope="row" class="dataset-label">{{ _('z-max') }}</th>
+                <td>{{ res.z_max }}</td>
+              </tr>
+            {% endif %}
+
+            {# All other fields, directly visible #}
+              {% for key, value in h.format_resource_items(res.items()) %}
+                {% if key not in ('has views', 'id', 'package id', 'revision id', 'state', 'format', 'created', 'last modified', 'resource license id', 'resource language', 'resource owner', 'resource owner email', 'resource contact', 'resource contact email', 'north', 'south', 'east', 'west', 'classification', 'completeness', 'update frequency', 'coordinate system', 'area', 'scale_factor', 'z_min', 'z_max') %}
+                  <tr><th scope="row">{{ _(key | capitalize) }}</th><td>{{ value }}</td></tr>
+                {% endif %}
+              {% endfor %}
+
+            {# Fields available under more link #}
               {% for key, value in h.format_resource_items(res.items()) %}
                 {% if key in ('has views', 'id', 'package id', 'revision id', 'state') %}
                   <tr class="toggle-more"><th scope="row">{{ _(key | capitalize) }}</th><td>{{ value }}</td></tr>
                 {% endif %}
               {% endfor %}
+
+            {% if res.state %}
+              {% if res.state == 'active' %}
+                  <tr class="toggle-more"><th scope="row">{{ _('State') }}</th><td>{{ _('Active') }}</td></tr>
+              {% elif res.state == 'deleted' %}
+                  <tr class="toggle-more"><th scope="row">{{ _('State') }}</th><td>{{ _('Deleted') }}</td></tr>
+              {% else %}
+                  <tr class="toggle-more"><th scope="row">{{ _('State') }}</th><td>{{ res.state }}</td></tr>
+              {% endif %}
+            {% endif %}
             </tbody>
           </table>
         </div>

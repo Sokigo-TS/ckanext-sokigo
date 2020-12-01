@@ -575,3 +575,36 @@ msgstr "Genom din profil kan andra CKAN användare få information om vem du är
 #: unknown
 msgid "As a sysadmin user you have full control over this CKAN instance. Proceed with care!"
 msgstr "Som sysadmin användare har du full behörighet i denna CKAN instans. Fortsätt med försiktighet!"
+
+#: ckan/public/base/javascript/modules/resource-reorder.js:42
+#: ckan/public/base/javascript/modules/resource-reorder.min.js:1
+msgid "Reorder resources"
+msgstr "Ändra ordning"
+
+#: unknown
+msgid "Last modified"
+msgstr "Senast ändrad"
+
+#: unknown
+msgid "Size"
+msgstr "Storlek"
+
+#: unknown
+msgid "On same domain"
+msgstr "I samma domän"
+
+#: unknown
+msgid "Url type"
+msgstr "Url typ"
+
+#: unknown
+msgid "upload"
+msgstr "uppladdning"
+
+#: unknown
+msgid "True"
+msgstr "Ja"
+
+#: unknown
+msgid "False"
+msgstr "Nej"
