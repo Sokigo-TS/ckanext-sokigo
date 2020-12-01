@@ -183,9 +183,9 @@
             {# All other fields, directly visible #}
               {% for key, value in h.format_resource_items(res.items()) %}
                 {% if key not in ('has views', 'id', 'package id', 'revision id', 'state', 'format', 'metadata created', 'Created', 'created', 'last modified', 'resource license id', 'resource language', 'resource owner', 'resource owner email', 'resource contact', 'resource contact email', 'north', 'south', 'east', 'west', 'classification', 'completeness', 'update frequency', 'coordinate system', 'area', 'scale factor', 'z min', 'z max', 'Skapad datum', 'skapad datum') %}
-                  {% if value == True %}
+                  {% if value is sameas true %}
                   <tr><th scope="row">{{ _(key | capitalize) }}</th><td>{{ _('True') }}</td></tr>
-                  {% elif value == False %}
+                  {% elif value is sameas false %}
                   <tr><th scope="row">{{ _(key | capitalize) }}</th><td>{{ _('False') }}</td></tr>
                   {% else %}
                   <tr><th scope="row">{{ _(key | capitalize) }}</th><td>{{ _(value) }}</td></tr>
@@ -196,9 +196,9 @@
             {# Fields available under more link #}
               {% for key, value in h.format_resource_items(res.items()) %}
                 {% if key in ('has views', 'id', 'package id', 'revision id', 'state') %}
-                  {% if value == True %}
+                  {% if value is sameas true %}
                   <tr class="toggle-more"><th scope="row">{{ _(key | capitalize) }}</th><td>{{ _('True') }}</td></tr>
-                  {% elif value == False %}
+                  {% elif value is sameas false %}
                   <tr class="toggle-more"><th scope="row">{{ _(key | capitalize) }}</th><td>{{ _('False') }}</td></tr>
                   {% else %}
                   <tr class="toggle-more"><th scope="row">{{ _(key | capitalize) }}</th><td>{{ _(value) }}</td></tr>
