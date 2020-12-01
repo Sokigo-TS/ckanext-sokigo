@@ -91,7 +91,7 @@
 			{% if res.created %}
               <tr>
                 <th scope="row" class="dataset-label">{{ _('Created') }}</th>
-                <td data-raw-key="created">{{ h.render_datetime(res.created, with_hours=True) }}</td>
+                <td data-raw-key="created">{% snippet 'snippets/local_friendly_datetime, datetime=res.created %}</td>
               </tr>
             {% else %}
               {# Workaround for bug in CKAN 2.8.5 #}
@@ -99,7 +99,7 @@
                 {% if key in ('Skapad datum', 'Created', 'skapad datum', 'created') %}
 				  <tr>
 					<th scope="row" class="dataset-label">{{ _('Created') }}</th>
-					<td data-raw-key="created">{{ h.render_datetime(value, with_hours=True) }}</td>
+					<td data-raw-key="created">{% snippet 'snippets/local_friendly_datetime, datetime=value %}</td>
 				  </tr>
                 {% endif %}
               {% endfor %}
@@ -108,12 +108,12 @@
 			{% if res.last_modified %}
               <tr>
                 <th scope="row" class="dataset-label">{{ _('Last Modified') }}</th>
-                <td data-raw-key="last_modified">{{ h.render_datetime(res.last_modified, with_hours=True) }}</td>
+                <td data-raw-key="last_modified">{% snippet 'snippets/local_friendly_datetime, datetime=res.last_modified %}</td>
               </tr>
             {% elif pkg.metadata_modified %}
               <tr>
                 <th scope="row" class="dataset-label">{{ _('Last Modified') }}</th>
-                <td data-raw-key="last_modified">{{ h.render_datetime(pkg.metadata_modified, with_hours=True) }}</td>
+                <td data-raw-key="last_modified">{% snippet 'snippets/local_friendly_datetime, datetime=pkg.metadata_modified %}</td>
               </tr>
             {% endif %}
 
@@ -182,7 +182,7 @@
 
             {# All other fields, directly visible #}
               {% for key, value in h.format_resource_items(res.items()) %}
-                {% if key not in ('has views', 'id', 'package id', 'revision id', 'state', 'format', 'metadata created', 'created', 'last modified', 'resource license id', 'resource language', 'resource owner', 'resource owner email', 'resource contact', 'resource contact email', 'north', 'south', 'east', 'west', 'classification', 'completeness', 'update frequency', 'coordinate system', 'area', 'scale factor', 'z min', 'z max') %}
+                {% if key not in ('has views', 'id', 'package id', 'revision id', 'state', 'format', 'metadata created', 'Created', 'created', 'last modified', 'resource license id', 'resource language', 'resource owner', 'resource owner email', 'resource contact', 'resource contact email', 'north', 'south', 'east', 'west', 'classification', 'completeness', 'update frequency', 'coordinate system', 'area', 'scale factor', 'z min', 'z max', 'Skapad datum', 'skapad datum') %}
                   {% if value == True %}
                   <tr><th scope="row">{{ _(key | capitalize) }}</th><td>{{ _('True') }}</td></tr>
                   {% elif value == False %}
@@ -196,7 +196,13 @@
             {# Fields available under more link #}
               {% for key, value in h.format_resource_items(res.items()) %}
                 {% if key in ('has views', 'id', 'package id', 'revision id', 'state') %}
+                  {% if value == True %}
+                  <tr class="toggle-more"><th scope="row">{{ _(key | capitalize) }}</th><td>{{ _('True') }}</td></tr>
+                  {% elif value == False %}
+                  <tr class="toggle-more"><th scope="row">{{ _(key | capitalize) }}</th><td>{{ _('False') }}</td></tr>
+                  {% else %}
                   <tr class="toggle-more"><th scope="row">{{ _(key | capitalize) }}</th><td>{{ _(value) }}</td></tr>
+                  {% endif %}
                 {% endif %}
               {% endfor %}
             </tbody>
