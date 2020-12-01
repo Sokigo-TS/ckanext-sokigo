@@ -91,14 +91,14 @@
 			{% if res.created %}
               <tr>
                 <th scope="row" class="dataset-label">{{ _('Created') }}</th>
-                <td>{{ h.render_datetime(res.created, with_hours=True) }}</td>
+                <td>{{ h.render_datetime(res.created, date_format='%Y-%m-%d %H:%M:%S') }}</td>
               </tr>
             {% endif %}
 
 			{% if res.last_modified %}
               <tr>
                 <th scope="row" class="dataset-label">{{ _('Last Modified') }}</th>
-                <td>{{ h.render_datetime(res.last_modified, with_hours=True) }}</td>
+                <td>{{ h.render_datetime(res.last_modified, date_format='%Y-%m-%d %H:%M:%S') }}</td>
               </tr>
             {% endif %}
 			  
@@ -168,26 +168,16 @@
             {# All other fields, directly visible #}
               {% for key, value in h.format_resource_items(res.items()) %}
                 {% if key not in ('has views', 'id', 'package id', 'revision id', 'state', 'format', 'created', 'last modified', 'resource license id', 'resource language', 'resource owner', 'resource owner email', 'resource contact', 'resource contact email', 'north', 'south', 'east', 'west', 'classification', 'completeness', 'update frequency', 'coordinate system', 'area', 'scale_factor', 'z_min', 'z_max') %}
-                  <tr><th scope="row">{{ _(key | capitalize) }}</th><td>{{ value }}</td></tr>
+                  <tr><th scope="row">{{ _(key | capitalize) }}</th><td>{{ _(value) }}</td></tr>
                 {% endif %}
               {% endfor %}
 
             {# Fields available under more link #}
               {% for key, value in h.format_resource_items(res.items()) %}
                 {% if key in ('has views', 'id', 'package id', 'revision id', 'state') %}
-                  <tr class="toggle-more"><th scope="row">{{ _(key | capitalize) }}</th><td>{{ value }}</td></tr>
+                  <tr class="toggle-more"><th scope="row">{{ _(key | capitalize) }}</th><td>{{ _(value) }}</td></tr>
                 {% endif %}
               {% endfor %}
-
-            {% if res.state %}
-              {% if res.state == 'active' %}
-                  <tr class="toggle-more"><th scope="row">{{ _('State') }}</th><td>{{ _('Active') }}</td></tr>
-              {% elif res.state == 'deleted' %}
-                  <tr class="toggle-more"><th scope="row">{{ _('State') }}</th><td>{{ _('Deleted') }}</td></tr>
-              {% else %}
-                  <tr class="toggle-more"><th scope="row">{{ _('State') }}</th><td>{{ res.state }}</td></tr>
-              {% endif %}
-            {% endif %}
             </tbody>
           </table>
         </div>
