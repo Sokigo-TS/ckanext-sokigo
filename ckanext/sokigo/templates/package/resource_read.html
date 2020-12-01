@@ -91,7 +91,7 @@
 			{% if res.created %}
               <tr>
                 <th scope="row" class="dataset-label">{{ _('Created') }}</th>
-                <td data-raw-key="created">{% snippet 'snippets/local_friendly_datetime, datetime=res.created %}</td>
+                <td><span class="automatic-local-datetime" data-datetime="{{ h.render_datetime(res.created, date_format='%Y-%m-%dT%H:%M:%S%z') }}">{{ h.render_datetime(res.created, with_hours=True) }}</span></td>
               </tr>
             {% else %}
               {# Workaround for bug in CKAN 2.8.5 #}
@@ -99,7 +99,7 @@
                 {% if key in ('Skapad datum', 'Created', 'skapad datum', 'created') %}
 				  <tr>
 					<th scope="row" class="dataset-label">{{ _('Created') }}</th>
-					<td data-raw-key="created">{% snippet 'snippets/local_friendly_datetime, datetime=value %}</td>
+					<td><span class="automatic-local-datetime" data-datetime="{{ h.render_datetime(value, date_format='%Y-%m-%dT%H:%M:%S%z') }}">{{ h.render_datetime(value, with_hours=True) }}</span></td>
 				  </tr>
                 {% endif %}
               {% endfor %}
@@ -108,12 +108,12 @@
 			{% if res.last_modified %}
               <tr>
                 <th scope="row" class="dataset-label">{{ _('Last Modified') }}</th>
-                <td data-raw-key="last_modified">{% snippet 'snippets/local_friendly_datetime, datetime=res.last_modified %}</td>
+                <td><span class="automatic-local-datetime" data-datetime="{{ h.render_datetime(res.last_modified, date_format='%Y-%m-%dT%H:%M:%S%z') }}">{{ h.render_datetime(res.last_modified, with_hours=True) }}</span></td>
               </tr>
             {% elif pkg.metadata_modified %}
               <tr>
                 <th scope="row" class="dataset-label">{{ _('Last Modified') }}</th>
-                <td data-raw-key="last_modified">{% snippet 'snippets/local_friendly_datetime, datetime=pkg.metadata_modified %}</td>
+                <td><span class="automatic-local-datetime" data-datetime="{{ h.render_datetime(pkg.metadata_modified, date_format='%Y-%m-%dT%H:%M:%S%z') }}">{{ h.render_datetime(pkg.metadata_modified, with_hours=True) }}</span></td>
               </tr>
             {% endif %}
 
