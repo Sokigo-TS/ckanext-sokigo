@@ -183,26 +183,15 @@
             {# All other fields, directly visible #}
               {% for key, value in h.format_resource_items(res.items()) %}
                 {% if key not in ('has views', 'id', 'package id', 'revision id', 'state', 'format', 'metadata created', 'Created', 'created', 'last modified', 'resource license id', 'resource language', 'resource owner', 'resource owner email', 'resource contact', 'resource contact email', 'north', 'south', 'east', 'west', 'classification', 'completeness', 'update frequency', 'coordinate system', 'area', 'scale factor', 'z min', 'z max', 'Skapad datum', 'skapad datum') %}
-                  {% set strval = value %}
-				  {% if value is sameas true %}
-                      {% set strval = 'True' %}
-				  {% elif value is sameas false %}
-                      {% set strval = 'False' %}
-                  {% endif %}
-                  <tr><th scope="row">{{ _(key | capitalize) }}</th><td rawval="{{ value }}">{{ _(strval) }}</td></tr>
+                  <tr><th scope="row">{{ _(key | capitalize) }}</th><td raw-val="{{ value }}">{{ _(value) }}</td></tr>
                 {% endif %}
               {% endfor %}
 
             {# Fields available under "more" link #}
               {% for key, value in h.format_resource_items(res.items()) %}
                 {% if key in ('has views', 'id', 'package id', 'revision id', 'state') %}
-                  {% set strval = value %}
-				  {% if value is sameas true %}
-                      {% set strval = 'True' %}
-				  {% elif value is sameas false %}
-                      {% set strval = 'False' %}
-                  {% endif %}
-                  <tr class="toggle-more"><th scope="row">{{ _(key | capitalize) }}</th><td rawval="{{ value }}">{{ _(strval) }}</td></tr>
+				  {% set isbool = value in (true, false) %}
+                  <tr class="toggle-more"><th scope="row">{{ _(key | capitalize) }}</th><td raw-val="{{ value }}" raw-val-is-bool="{{ isbool }}">{{ _(value) }}</td></tr>
                 {% endif %}
               {% endfor %}
             </tbody>
