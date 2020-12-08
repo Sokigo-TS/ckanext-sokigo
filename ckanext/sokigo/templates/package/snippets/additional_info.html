@@ -54,12 +54,18 @@
         {% if h.check_access('package_update',{'id':pkg_dict.id}) %}
           <tr>
             <th scope="row" class="dataset-label">{{ _("State") }}</th>
-            <td class="dataset-details">{{ _(pkg_dict.state) }}</td>
+            <td class="dataset-details">{{ _(pkg_dict.state | capitalize) }}</td>
           </tr>
         {% endif %}
+
+          <tr>
+            <th scope="row" class="dataset-label">{{ _("License") }}</th>
+            <td class="dataset-details">{% snippet "snippets/license.html", pkg_dict=pkg_dict, text_only=True %}</td>
+          </tr>
+		
         {% if pkg_dict.metadata_modified %}
           <tr>
-            <th scope="row" class="dataset-lab`el">{{ _("Last Updated") }}</th>
+            <th scope="row" class="dataset-label">{{ _("Last Updated") }}</th>
             <td class="dataset-details">
                 {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=pkg_dict.metadata_modified %}
             </td>

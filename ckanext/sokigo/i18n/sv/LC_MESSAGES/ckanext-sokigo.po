@@ -608,3 +608,7 @@ msgstr "Ja"
 #: unknown
 msgid "False"
 msgstr "Nej"
+
+#: unknown
+msgid "Media type"
+msgstr "Media typ"
