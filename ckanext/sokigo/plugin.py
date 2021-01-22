@@ -1,7 +1,10 @@
 import os
+import logging
 import ckan.plugins as p
 import ckan.plugins.toolkit as t
 from ckan.lib.plugins import DefaultTranslation
+
+log = logging.getLogger('ckanext.sokigo')
 
 # SAML2 mapping by name: AD-group name must match organization name.
 def saml2_mapping_by_name(saml_info):
@@ -15,7 +18,9 @@ def saml2_mapping_by_name(saml_info):
         capacity = 'member'
     if (capacity == ''):
         capacity = 'member'
-        
+    
+    log.info('Mapping SAML2 groups with organizations by name. Group name must match organization name.')
+
     if ('groups' in saml_info):
         groups = saml_info['groups']
         for group in groups:
@@ -42,6 +47,8 @@ def saml2_mapping_by_list(saml_info):
     mapping_list = os.environ.get('CKANEXT_SOKIGO_ORGANIZATION_MAPPING')
     if (mapping_list is None):
         return result
+
+    log.info('Mapping SAML2 groups with organizations by manual list: %s', mapping_list)
         
     if ('groups' in saml_info):
         groups = saml_info['groups']
