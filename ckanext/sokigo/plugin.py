@@ -25,13 +25,14 @@ def saml2_mapping_by_name(saml_info):
     if ('groups' in saml_info):
         groups = saml_info['groups']
         for group in groups:
-            result_log = result_log + group + '=>' + group.lower() + ' (' + capacity + '),'
+            orgid = group.lower().replace(' ','_').replace('å','a').replace('ä','a').replace('ö','o')
+            result_log = result_log + group + '=>' + orgid + ' (' + capacity + '),'
             result.update(
             {
-                group.lower(): {
+                orgid: {
                     'capacity': capacity,
                     'data': {
-                        'id': group.lower(),
+                        'id': orgid,
                         'description': group
                     }
                 }
@@ -59,8 +60,8 @@ def saml2_mapping_by_list(saml_info):
         # Loop through all groups
         for group in groups:
             groups_log = groups_log + group + ','
-            # Loop through all mapping entryes
-            for mapping in mapping_list.split():
+            # Loop through all mapping entries
+            for mapping in mapping_list.split(';'):
                 bits = mapping.split('~')
                 # First item is saml2-group and second is ckan-organization. Third item is capacity (member or editor).
                 # Check if we're having a match (case-insensitive).
