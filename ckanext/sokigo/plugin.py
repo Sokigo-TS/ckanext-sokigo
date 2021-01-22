@@ -25,13 +25,13 @@ def saml2_mapping_by_name(saml_info):
     if ('groups' in saml_info):
         groups = saml_info['groups']
         for group in groups:
-            result_log = result_log + group + '=>' + group + ' (' + capacity + '),'
+            result_log = result_log + group + '=>' + group.lower() + ' (' + capacity + '),'
             result.update(
             {
-                group: {
+                group.lower(): {
                     'capacity': capacity,
                     'data': {
-                        'id': group,
+                        'id': group.lower(),
                         'description': group
                     }
                 }
@@ -56,18 +56,23 @@ def saml2_mapping_by_list(saml_info):
         
     if ('groups' in saml_info):
         groups = saml_info['groups']
+        # Loop through all groups
         for group in groups:
             groups_log = groups_log + group + ','
+            # Loop through all mapping entryes
             for mapping in mapping_list.split():
                 bits = mapping.split('~')
-                if (bits[0] == group):
-                    result_log = result_log + group + '=>' + bits[1] + ' (' + bits[2] + '),'
+                # First item is saml2-group and second is ckan-organization. Third item is capacity (member or editor).
+                # Check if we're having a match (case-insensitive).
+                # Also check that org is not already present in result list.
+                if (bits[0].lower() == group.lower() and not(bits[1].lower() in result)):
+                    result_log = result_log + group + '=>' + bits[1].lower() + ' (' + bits[2] + '),'
                     result.update(
                     {
-                        bits[1]: {
+                        bits[1].lower(): {
                             'capacity': bits[2],
                             'data': {
-                                'id': bits[1],
+                                'id': bits[1].lower(),
                                 'description': bits[1]
                             }
                         }
