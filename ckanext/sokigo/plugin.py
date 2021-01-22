@@ -3,6 +3,63 @@ import ckan.plugins as p
 import ckan.plugins.toolkit as t
 from ckan.lib.plugins import DefaultTranslation
 
+# SAML2 mapping by name: AD-group name must match organization name.
+def saml2_mapping_by_name(saml_info):
+    result = {}
+
+    if (saml_info is None):
+        return result
+
+    capacity = os.environ.get('CKANEXT_SOKIGO_ORGANIZATION_MAPPING_CAPACITY')
+    if (capacity is None):
+        capacity = 'member'
+    if (capacity == ''):
+        capacity = 'member'
+        
+    if ('groups' in saml_info):
+        groups = saml_info['groups']
+        for group in groups:
+            result.update(
+            {
+                group: {
+                    'capacity': capacity,
+                    'data': {
+                        'id': group,
+                        'description': group
+                    }
+                }
+            })
+            
+    return result
+
+# SAML2 mapping by list: Use mapping list [ad_group_name]~[ckan_org]~[capacity]
+def saml2_mapping_by_list(saml_info):
+    result = {}
+
+    if (saml_info is None):
+        return result
+
+    mapping_list = os.environ.get('CKANEXT_SOKIGO_ORGANIZATION_MAPPING')
+    if (mapping_list is None):
+        return result
+        
+    if ('groups' in saml_info):
+        groups = saml_info['groups']
+        for group in groups:
+            for mapping in mapping_list.split():
+                bits = mapping.split('~')
+                if (bits[0] == group):
+                    result.update(
+                    {
+                        bits[1]: {
+                            'capacity': bits[2],
+                            'data': {
+                                'id': bits[1],
+                                'description': bits[1]
+                            }
+                        }
+                    })
+    return result
 
 class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
     p.implements(p.IConfigurer)
@@ -105,61 +162,3 @@ class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
 
     def package_types(self):
         return []
-    
-    # SAML2 mapping by name: AD-group name must match organization name.
-    def saml2_mapping_by_name(saml_info):
-        result = {}
-
-        if (saml_info is None):
-            return result
-
-        capacity = os.environ.get('CKANEXT_SOKIGO_ORGANIZATION_MAPPING_CAPACITY')
-        if (capacity is None):
-            capacity = 'member'
-        if (capacity == ''):
-            capacity = 'member'
-            
-        if ('groups' in saml_info):
-            groups = saml_info['groups']
-            for group in groups:
-                result.update(
-                {
-                    group: {
-                        'capacity': capacity,
-                        'data': {
-                            'id': group,
-                            'description': group
-                        }
-                    }
-                })
-                
-        return result
-
-    # SAML2 mapping by list: Use mapping list [ad_group_name]~[ckan_org]~[capacity]
-    def saml2_mapping_by_list(saml_info):
-        result = {}
-
-        if (saml_info is None):
-            return result
-
-        mapping_list = os.environ.get('CKANEXT_SOKIGO_ORGANIZATION_MAPPING')
-        if (mapping_list is None):
-            return result
-            
-        if ('groups' in saml_info):
-            groups = saml_info['groups']
-            for group in groups:
-                for mapping in mapping_list.split():
-                    bits = mapping.split('~')
-                    if (bits[0] == group):
-                        result.update(
-                        {
-                            bits[1]: {
-                                'capacity': bits[2],
-                                'data': {
-                                    'id': bits[1],
-                                    'description': bits[1]
-                                }
-                            }
-                        })
-        return result
