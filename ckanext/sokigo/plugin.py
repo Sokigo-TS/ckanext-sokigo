@@ -9,6 +9,7 @@ log = logging.getLogger('ckanext.sokigo')
 # SAML2 mapping by name: AD-group name must match organization name.
 def saml2_mapping_by_name(saml_info):
     result = {}
+    result_log = ''
 
     if (saml_info is None):
         return result
@@ -24,6 +25,7 @@ def saml2_mapping_by_name(saml_info):
     if ('groups' in saml_info):
         groups = saml_info['groups']
         for group in groups:
+            result_log = result_log + group + '=>' + group + ' (' + capacity + '),'
             result.update(
             {
                 group: {
@@ -34,12 +36,14 @@ def saml2_mapping_by_name(saml_info):
                     }
                 }
             })
-            
+    log.info('Mapping result: %s', result_log)
     return result
 
 # SAML2 mapping by list: Use mapping list [ad_group_name]~[ckan_org]~[capacity]
 def saml2_mapping_by_list(saml_info):
     result = {}
+    result_log = ''
+    groups_log = ''
 
     if (saml_info is None):
         return result
@@ -53,9 +57,11 @@ def saml2_mapping_by_list(saml_info):
     if ('groups' in saml_info):
         groups = saml_info['groups']
         for group in groups:
+            groups_log = groups_log + group + ','
             for mapping in mapping_list.split():
                 bits = mapping.split('~')
                 if (bits[0] == group):
+                    result_log = result_log + group + '=>' + bits[1] + ' (' + bits[2] + '),'
                     result.update(
                     {
                         bits[1]: {
@@ -66,6 +72,8 @@ def saml2_mapping_by_list(saml_info):
                             }
                         }
                     })
+    log.info('Groups detected: %s', groups_log)
+    log.info('Mapping result: %s', result_log)
     return result
 
 class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
