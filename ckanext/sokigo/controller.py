@@ -45,7 +45,7 @@ class CopyController(PackageController):
         if data is None:
             data = t.get_action('package_show')(None, {'id': id})
             # generate new unused package name
-            data['title'] = '{} {}'.format(t._('Copy of'), data['title'])
+            data['title'] = u'{} {}'.format(t._('Copy of'), data['title'])
             data['name'] = '{}{}'.format(data['name'],t._('-copy'))
             while True:
                 try:
