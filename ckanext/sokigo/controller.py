@@ -165,7 +165,7 @@ class CopyController(PackageController):
                 import random
                 data['name'] = '{}{}-{}'.format(data['name'], t._('-copy'), random.randint(1, 100))
 
-        data['title'] = '{} {}'.format(t._('Copy of'), data['title'])
+        data['title'] = u'{} {}'.format(t._('Copy of'), data['title'])
 
         # remove unnecessary attributes from the dataset
         remove_attrs = ['id', 'revision_id', 'metadata_created', 'metadata_modified',
