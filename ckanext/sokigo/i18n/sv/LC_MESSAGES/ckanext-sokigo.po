@@ -21,7 +21,7 @@ msgstr ""
 
 #: ckanext/sokigo/controller.py:33
 msgid "Unauthorized to copy this package"
-msgstr "Rättigheter saknas för att kopiera det här datasetet"
+msgstr "Behörighet saknas för att kopiera detta dataset"
 
 #: ckanext/sokigo/templates/home/snippets/promoted.html:3
 msgid "Open data portal"
@@ -72,7 +72,7 @@ msgstr "Skapad datum"
 #: ckanext/sokigo/templates/package/resource_read.html:32
 #: ckanext/sokigo/templates/package/snippets/resource_form.html:39
 msgid "Format"
-msgstr ""
+msgstr "Format"
 
 #: ckanext/sokigo/templates/package/resource_read.html:36
 #: ckanext/sokigo/templates/package/snippets/package_basic_fields.html:30
@@ -290,8 +290,7 @@ msgstr "t.ex. CSV, XML or JSON"
 
 #: ckanext/sokigo/templates/package/snippets/resource_form.html:42
 msgid "This will be guessed automatically. Leave blank if you wish"
-msgstr ""
-"Här kommer en automatisk gissning att läggas in. Lämna blankt om du vill"
+msgstr "Här kommer en automatisk gissning att läggas in. Lämna blankt om du vill"
 
 #: ckanext/sokigo/templates/package/snippets/resource_form.html:48
 msgid "Language of resource"
@@ -394,6 +393,10 @@ msgstr "Slutför"
 #: ckanext/sokigo/templates/package/snippets/resource_form.html:123
 msgid "Add"
 msgstr "Lägg till"
+
+#: ckanext/sokigo/templates/package/snippets/tags.html:3
+msgid "Categories and keywords"
+msgstr "Nyckelord"
 
 #: ckanext/sokigo/templates/snippets/custom_form_fields.html:20
 #: ckanext/sokigo/templates/snippets/custom_form_fields.html:37

@@ -1,8 +1,19 @@
-{% if tags %}
-{% block tags_title %}
-<h3> {{ _('Tags') }} </h3>
-{% endblock %}
-<section class="tags">
-    {% snippet 'snippets/tag_list.html', tags=tags, _class='tag-list well' %}
-</section>
-{% endif %}
+{#
+    Renders tags
+  
+    tags - a list of tag dicts
+  
+    Example:
+  
+    {% snippet "package/snippets/tags.html", tags=pkg.tags %}
+  
+  #}
+  {% if tags %}
+  {% block tags_title %}
+  <h3> {{ _('Tags') }} </h3>
+  {% endblock %}
+    <section class="tags">
+      {% snippet 'snippets/tag_list.html', tags=tags, _class='tag-list' %}
+    </section>
+  {% endif %}
+  

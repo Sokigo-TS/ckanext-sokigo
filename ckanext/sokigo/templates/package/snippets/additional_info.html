@@ -13,7 +13,11 @@
           <tr>
             <th scope="row" class="dataset-label">{{ _('Source') }}</th>
             {% if h.is_url(pkg_dict.url) %}
-              <td class="dataset-details" property="foaf:homepage">{{ h.link_to(pkg_dict.url, pkg_dict.url, rel='foaf:homepage', target='_blank') }}</td>
+              <td class="dataset-details" property="foaf:homepage">
+                <a href="{{ pkg_dict.url }}" rel="foaf:homepage" target="_blank">
+                  {{ pkg_dict.url }}
+                </a>
+              </td>
             {% else %}
               <td class="dataset-details" property="foaf:homepage">{{ pkg_dict.url }}</td>
             {% endif %}
@@ -54,7 +58,7 @@
         {% if h.check_access('package_update',{'id':pkg_dict.id}) %}
           <tr>
             <th scope="row" class="dataset-label">{{ _("State") }}</th>
-            <td class="dataset-details">{{ _(pkg_dict.state | capitalize) }}</td>
+            <td class="dataset-details">{{ _(pkg_dict.state) }}</td>
           </tr>
         {% endif %}
 
@@ -91,7 +95,7 @@
         {% for extra in h.sorted_extras(pkg_dict.extras) %}
           {% set key, value = extra %}
           <tr rel="dc:relation" resource="_:extra{{ i }}">
-            <th scope="row" class="dataset-label" property="rdfs:label">{{ _(key) }}</th>
+            <th scope="row" class="dataset-label" property="rdfs:label">{{ _(key|e) }}</th>
             <td class="dataset-details" property="rdf:value">{{ value }}</td>
           </tr>
         {% endfor %}

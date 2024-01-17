@@ -33,14 +33,15 @@
     {{ super() }}
 
     {% if h.check_access('package_update', {'id':pkg.id }) %}
-        <div class="btn-group">
-            <a class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                <i class="fa fa-copy"></i> {{ _('Copy') }}
+        <div class="dropdown btn-group">
+            <a href="#" class="btn btn-success dropdown-toggle" type="button" id="dropdownCopy" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa fa-copy"></i>
+                {{ _('Copy') }}
                 <span class="caret"></span>
             </a>
-            <ul class="dropdown-menu">
-                <li><a href="{{h.url_for(controller='ckanext.sokigo.controller:CopyController', action='copy_resources', id=pkg.id)}}" class="btn"><i class="fa fa-files-o"></i> {{ _('with resources') }}</a></li>
-                <li><a href="{{h.url_for(controller='ckanext.sokigo.controller:CopyController', action='copy', id=pkg.id)}}" class="btn"><i class="fa fa-ban"></i> {{ _('without resources') }}</a></li>
+            <ul class="dropdown-menu" aria-labelledby="dropdownCopy">
+                <li><a href="{{h.url_for('copy.copy_resources', id=pkg.id)}}" class="dropdown-item"><i class="fa fa-bars"></i> {{ _('with resources') }}</a></li>
+                <li><a href="{{h.url_for('copy.copy', id=pkg.id)}}" class="dropdown-item"><i class="fa fa-ban"></i> {{ _('without resources') }}</a></li>
             </ul>
         </div>
     {% endif %}

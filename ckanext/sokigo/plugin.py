@@ -2,7 +2,13 @@ import os
 import logging
 import ckan.plugins as p
 import ckan.plugins.toolkit as t
+import ckanext.sokigo.copyhelper as copyhelper
 from ckan.lib.plugins import DefaultTranslation
+from flask import Blueprint
+from typing import Any, cast
+from ckan.types import Context, Schema, Validator, ValidatorFactory
+
+from ckanext.sokigo.copyhelper import copy_blueprint
 
 log = logging.getLogger('ckanext.sokigo')
 
@@ -85,8 +91,8 @@ def saml2_mapping_by_list(saml_info):
 class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
     p.implements(p.IConfigurer)
     p.implements(p.ITranslation)
-    p.implements(p.IDatasetForm)
-    p.implements(p.IRoutes, inherit=True)
+    p.implements(p.IDatasetForm, inherit=True)
+    p.implements(p.IBlueprint)
 
     # IConfigurer
 
@@ -95,22 +101,33 @@ class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
         t.add_public_directory(config_, 'public')
         t.add_resource('fanstatic', 'sokigo')
 
-    # IRoutes
+    # IBlueprint
 
-    def before_map(self, map):
+    def get_blueprint(self):
 
-        map.connect('copy', '/dataset/copy/{id}',
-                    controller='ckanext.sokigo.controller:CopyController',
-                    action='copy')
-        map.connect('copy_resources', '/dataset/copy/{id}/resources',
-                    controller='ckanext.sokigo.controller:CopyController',
-                    action='copy_resources')
+        return copy_blueprint
+        # rules = [
+            # ('/<id>/resources', 'copy_resources', copyhelper.copy_resources),
+            # ('/<id>', 'copy', copyhelper.copy),
+        # ]
+        # for rule in rules:
+            # blueprint.add_url_rule(*rule)
 
-        return map
+        # return blueprint
+
+        # blueprint = Blueprint('copy', self.__module__, url_prefix='/dataset/copy')
+        # rules = [
+            # ('/<id>/resources', 'copy_resources', copyhelper.copy_resources),
+            # ('/<id>', 'copy', copyhelper.copy),
+        # ]
+        # for rule in rules:
+            # blueprint.add_url_rule(*rule)
+
+        # return blueprint
 
     # IDatasetForm
 
-    def _modify_package_schema(self, schema):
+    def _modify_package_schema(self, schema: Schema):
         defaults = [t.get_validator('ignore_missing')]
         package_defaults = [t.get_validator('ignore_missing'),
                             t.get_converter('convert_to_extras')]
@@ -122,7 +139,7 @@ class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
             'metadata_language': package_defaults,
         })
 
-        schema['resources'].update({
+        cast(Schema, schema['resources']).update({
             'resource_language': defaults,
             'completeness': defaults,
             'classification': defaults,
@@ -141,15 +158,15 @@ class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
         return schema
 
     def create_package_schema(self):
-        schema = super(SokigoPlugin, self).create_package_schema()
+        schema: Schema = super(SokigoPlugin, self).create_package_schema()
         return self._modify_package_schema(schema)
 
     def update_package_schema(self):
-        schema = super(SokigoPlugin, self).update_package_schema()
+        schema: Schema = super(SokigoPlugin, self).update_package_schema()
         return self._modify_package_schema(schema)
 
-    def show_package_schema(self):
-        schema = super(SokigoPlugin, self).show_package_schema()
+    def show_package_schema(self) -> Schema:
+        schema: Schema = super(SokigoPlugin, self).show_package_schema()
         defaults = [t.get_validator('ignore_missing')]
         package_defaults = [t.get_converter('convert_from_extras'),
                             t.get_validator('ignore_missing')]
@@ -161,7 +178,7 @@ class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
 
         })
 
-        schema['resources'].update({
+        cast(Schema, schema['resources']).update({
             'resource_language': defaults,
             'completeness': defaults,
             'classification': defaults,
@@ -179,7 +196,13 @@ class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
         return schema
 
     def is_fallback(self):
+        # Return True to register this plugin as the default handler for
+        # package types not handled by any other IDatasetForm plugin.
         return True
 
     def package_types(self):
+        # This plugin doesn't handle any special package types, it just
+        # registers itself as the default (above).
         return []
+
+    
