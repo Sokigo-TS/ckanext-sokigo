@@ -1,7 +1,12 @@
 {% set intro = g.site_intro_text %}
+{% set html_content = h.get_landingpage_news() %}
 
-<div class="module-content box">
-  <header>
+<div class="module-content box" id="GeodirektLandingPage">
+
+  {% if html_content is not none %}
+    {{ html_content | safe }}
+  {% else %}
+    <header>
     {% if intro %}
       {{ h.render_markdown(intro) }}
     {% else %}
@@ -20,4 +25,6 @@
     </section>
     {% endblock %}
    {% endif %}
+  {% endif %}
+  
 </div>

@@ -17,6 +17,10 @@ import flask
 from flask import Blueprint
 import logging
 import json
+import requests
+import base64
+
+from ckan.common import config as ckan_config
 
 tuplize_dict = l.tuplize_dict
 clean_dict = l.clean_dict
@@ -26,6 +30,15 @@ flatten_to_string_key = l.flatten_to_string_key
 logger = logging.getLogger(__name__)
 
 copy_blueprint = Blueprint('copy', __name__, url_prefix='/dataset/copy')
+
+all_helpers = {}
+
+def helper(fn):
+    """
+    collect helper functions into ckanext.editor.all_helpers dict
+    """
+    all_helpers[fn.__name__] = fn
+    return fn
 
 @copy_blueprint.route('/<id>/resources', methods=['GET','POST'])
 def copy_resources(id, data=None, errors=None, error_summary=None):
@@ -260,6 +273,42 @@ def _guess_package_type(expecting_name=False):
         pt = 'dataset'
 
     return pt
+    
+@helper
+def get_landingpage_news():
+    try:
+        api_url =  ckan_config.get('landingpage_url')
+        username = ckan_config.get('landingpage_username') 
+        password = ckan_config.get('landingpage_password') 
+                
+        # Create base64-encoded credentials
+        credentials = f"{username}:{password}"
+        base64_credentials = base64.b64encode(credentials.encode()).decode()
+        
+        # Define the headers with basic authentication
+        headers = {"Authorization": f"Basic {base64_credentials}"}
+        
+        # Perform the HTTP GET request with basic authentication
+        response = requests.get(api_url, headers=headers)
+        
+        # Check if the request was successful
+        if response.status_code == 200:
+            
+            # Parse the JSON response
+            response_data = json.loads(response.text)
+            
+            # Extract the value from the storage object
+            html_content = response_data['body']['storage']['value']
+        
+            return html_content
+        else:
+            print(f"Failed to fetch API response. Status code: {response.status_code}")
+            return None
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        return None    
+        
+    
 
 #class CopyController(PackageController):
 #

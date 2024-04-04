@@ -10,6 +10,8 @@ from ckan.types import Context, Schema, Validator, ValidatorFactory
 
 from ckanext.sokigo.copyhelper import copy_blueprint
 
+from ckanext.sokigo import copyhelper
+
 log = logging.getLogger('ckanext.sokigo')
 
 # SAML2 mapping by name: AD-group name must match organization name.
@@ -88,18 +90,22 @@ def saml2_mapping_by_list(saml_info):
     log.info('Mapping result: %s', result_log)
     return result
 
+
 class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
     p.implements(p.IConfigurer)
     p.implements(p.ITranslation)
+    p.implements(p.ITemplateHelpers)
     p.implements(p.IDatasetForm, inherit=True)
     p.implements(p.IBlueprint)
-
+      
     # IConfigurer
-
     def update_config(self, config_):
         t.add_template_directory(config_, 'templates')
         t.add_public_directory(config_, 'public')
         t.add_resource('fanstatic', 'sokigo')
+
+    def get_helpers(self):
+        return dict(copyhelper.all_helpers)
 
     # IBlueprint
 
@@ -204,5 +210,8 @@ class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
         # This plugin doesn't handle any special package types, it just
         # registers itself as the default (above).
         return []
+
+
+    
 
     
