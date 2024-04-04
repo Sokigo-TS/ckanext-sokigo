@@ -4,7 +4,9 @@
 <div class="module-content box" id="GeodirektLandingPage">
 
   {% if html_content is not none %}
-    {{ html_content | safe }}
+    <div style="height:220px; width:420px;">
+      {{ html_content | safe }}
+	</div>
   {% else %}
     <header>
     {% if intro %}
