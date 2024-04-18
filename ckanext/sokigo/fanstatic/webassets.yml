@@ -1,8 +1,5 @@
 sokigo_js:
   filters: rjsmin
   output: sokigo/%(version)s_sokigo_js.js
-  extra:
-    preload:
-      - base/main
   contents:
     - common.js
