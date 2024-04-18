@@ -1,0 +1,16 @@
+{% asset 'sokigo/sokigo_js' %}
+ 
+<div class="form-group control-medium control-select">
+	<label class="form-label" for="field-linked_dataset">{{ _("Dataset") }}</label>
+	<div class="controls">
+		<select id="field-linked_dataset" name="linked_dataset" class="form-control form-select">
+			<option value=""/>
+				 {% set existing_linked_dataset_id = data.get('linked_dataset') %}
+                {% for dataset in h.get_datasets(data) %}
+			<option value="{{ dataset['value'] }}" {% if existing_linked_dataset_id==dataset['value' ] %}selected="selected" {% endif %}>{{ dataset['label']|safe }} </option> {% endfor %}
+		</select>
+		<button class="btn btn-default btn-xs" style="top:5px;" type="button" id="openDataset">Goto</button>
+              {% if error %}		<span class="error-block">{{ error }}</span>{% endif %}
+           
+	</div>
+</div>

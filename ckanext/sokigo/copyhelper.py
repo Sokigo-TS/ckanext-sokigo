@@ -20,6 +20,9 @@ import json
 import requests
 import base64
 
+import ckan.model as model
+
+
 from ckan.common import config as ckan_config
 
 tuplize_dict = l.tuplize_dict
@@ -30,6 +33,8 @@ flatten_to_string_key = l.flatten_to_string_key
 logger = logging.getLogger(__name__)
 
 copy_blueprint = Blueprint('copy', __name__, url_prefix='/dataset/copy')
+
+from urllib.parse import quote
 
 all_helpers = {}
 
@@ -306,9 +311,26 @@ def get_landingpage_news():
             return None
     except Exception as e:
         print(f"An error occurred: {str(e)}")
-        return None    
-        
+        return None          
+
+@helper
+def get_datasets(selected):
+    datasets = model.Session.query(model.Package)
+
+    if selected:
+        selected_id = selected.get('id', None)
+        if selected_id:
+            # Remove the selected dataset ID from the list of datasets
+            datasets = datasets.filter(model.Package.id != selected_id)
     
+      
+    base_url = ckan_config.get('ckan.site_url')  # Get the site URL from configuration
+    dataset_choices = [{
+        'value': r.id,
+        'label': f'<a href="{base_url}/dataset/{quote(r.id)}" target="_blank">{r.name}</a>'
+    } for r in datasets if r.state == 'active']
+
+    return dataset_choices
 
 #class CopyController(PackageController):
 #
