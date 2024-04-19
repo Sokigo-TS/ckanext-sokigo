@@ -67,7 +67,7 @@ setup(
     # have to be included in MANIFEST.in as well.
     include_package_data=True,
     package_data={
-        'ckanext': ['sokigo/public/geodirekt.png']
+        'ckanext': ['sokigo/public/geodirekt.png', 'sokigo/fanstatic/common.js', 'sokigo/fanstatic/webassets.yml']
     },
 
     # Although 'package_data' is the preferred approach, in some case you may
