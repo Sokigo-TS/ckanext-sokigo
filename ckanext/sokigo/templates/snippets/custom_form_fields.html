@@ -11,41 +11,10 @@ Example:
 #}
 {% import "macros/form.html" as form %}
 
-{% macro custom(names=(), id="", label="", values=(), placeholders=(), error="", classes=[], attrs={}, is_required=false, key_values=()) %}
-{%- set classes = (classes|list) -%}
-{%- set label_id = (id or names[0]) ~ "-key" -%}
-{%- set extra_html = caller() if caller -%}
-{%- do classes.append('control-custom') -%}
-
-{% call form.input_block(label_id, label or name, error, classes, control_classes=["editor"], extra_html=extra_html, is_required=is_required) %}
-<div class="row">
-  <div class="col-md-6">
-    <div class="input-group" {{ form.attributes(attrs) }}>
-      <label for="{{ label_id }}" class="input-group-addon">{{ _('Key') }}</label>
-      <input class="form-control" id="{{ id or names[0] }}-key" type="text" name="{{ names[0] }}" value="{{ values[0] | empty_and_escape }}" placeholder="{{ placeholders[0] }}" />
-    </div>
-  </div>
-  <div class="col-md-6">
-    {% if values[0] or values[1] or error %}
-    <label class="checkbox pull-right" for="{{ id or names[2] }}-remove">
-      <input type="checkbox" id="{{ id or names[2] }}-remove" name="{{ names[2] }}"{% if values[2] %} checked{% endif %} />
-      <span class="btn btn-danger"><span class="fa fa-trash"></span><span class="sr-only">{{ _('Remove') }}</span></span>
-    </label>
-    {% endif %}
-    <div class="input-group" {{ form.attributes(attrs) }}>
-      <label for="{{ id or names[1] }}-value" class="input-group-addon">{{ _('Custom Value') }}</label>
-      <input class="form-control" id="{{ id or names[1] }}-value" type="text" name="{{ names[1] }}" value="{{ values[1] | empty_and_escape }}" placeholder="{{ placeholders[1] }}" />
-    </div>
-  </div>
-</div>
-
-{% endcall %}
-{% endmacro %}
-
 <div data-module="custom-fields">
   {% for extra in extras %}
     {% set prefix = 'extras__%d__' % loop.index0 %}
-    {{ custom(
+    {{ form.custom(
       names=(prefix ~ 'key', prefix ~ 'value', prefix ~ 'deleted'),
       id='field-extras-%d' % loop.index,
       label=_('Custom Field'),
@@ -62,7 +31,8 @@ Example:
   {% for extra in range(total_extras, total_extras + empty_extras) %}
     {% set index = loop.index0 + (extras|count) %}
     {% set prefix = 'extras__%d__' % index %}
-    {{ custom(
+	
+    {{ form.custom(
       names=(prefix ~ 'key', prefix ~ 'value', prefix ~ 'deleted'),
       id='field-extras-%d' % index,
       label=_('Custom Field'),
