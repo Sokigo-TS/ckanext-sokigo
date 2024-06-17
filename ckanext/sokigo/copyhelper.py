@@ -332,6 +332,19 @@ def get_datasets(selected):
 
     return dataset_choices
 
+@helper
+def get_dataset_title(dataset_id):
+    
+    try:
+        dataset = t.get_action('package_show')( {
+                    "ignore_auth": True,
+                    "use_cache": False,
+                    "validate": False,
+                }, {'id': dataset_id})
+        return dataset['title']
+    except t.ObjectNotFound:
+        return None
+
 #class CopyController(PackageController):
 #
 #    p.implements(p.IBlueprint)
