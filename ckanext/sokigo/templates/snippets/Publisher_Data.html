@@ -1,0 +1,30 @@
+{% asset 'sokigo/sokigo_js' %}
+ 
+<div class="form-group control-medium control-select">
+	<label class="form-label" for="field-Utgivare">{{ _("publisher") }}</label>
+	<div class="controls">
+		<select id="field-Utgivare" name="Utgivare" class="form-control form-select">
+			<option value=""/>
+				 {% set existing_source_id = data.get('Utgivare') %}
+                {% for publisher in h.get_publisher_from_json(data) %}
+			<option value="{{ publisher['value'] }}" 
+			data-uri="{{publisher['uri'] }}"
+                            data-email="{{ publisher['email'] }}"
+                            data-type="{{publisher['type'] }}"
+                            data-url="{{publisher['url'] }}"
+			{% if existing_source_id==publisher['value' ] %}selected="selected" {% endif %}>{{ publisher['label']|safe }} </option> {% endfor %}
+		</select>
+              {% if error %}		<span class="error-block">{{ error }}</span>{% endif %}
+	</div>
+
+</div>	
+  <style>
+/* Style for the details box */
+.details-box {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 4px;
+}
+
+  </style>

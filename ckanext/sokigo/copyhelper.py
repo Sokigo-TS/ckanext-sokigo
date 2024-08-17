@@ -22,6 +22,8 @@ import base64
 
 import ckan.model as model
 
+import json
+import os
 
 from ckan.common import config as ckan_config
 
@@ -344,6 +346,41 @@ def get_dataset_title(dataset_id):
         return dataset['title']
     except t.ObjectNotFound:
         return None
+
+@helper
+def get_publisher_from_json(selected):
+    json_file_path = r'c:\app\src\ckan\publisher_data\publisherdata.json'
+
+    if not os.path.exists(json_file_path):
+        return []
+
+    try:
+
+        # Read and parse the JSON file
+        with open(json_file_path, 'r') as json_file:
+            data = json.load(json_file)
+        
+        # Check if data is empty
+        if not data:
+            return []   
+            
+        # Extract selected_id if provided
+        selected_id = selected.get('id') if selected else None    
+    
+        # Process the data to the desired format
+        dataset_choices = [{
+            'value': item['id'],
+            'label': item['name'],
+            'uri': item['uri'],
+            'email': item['email'],
+            'type': item['type'],
+            'url': item['url']
+        } for item in data if item['id'] != selected_id]
+    
+        return dataset_choices
+    except (json.JSONDecodeError, IOError):
+        # Handle cases where the file can't be read or is not a valid JSON
+        return []
 
 #class CopyController(PackageController):
 #

@@ -10,3 +10,33 @@ document.getElementById('openDataset').addEventListener('click', function () {
         return;
     }
 });
+
+// Below code is used for Publisher_Data.html file, when publisher is selected from drop down then show other read-only fields
+
+ document.addEventListener('DOMContentLoaded', function () {
+    var dropdown = document.getElementById('field-Utgivare');
+    var uriField = document.getElementById('field-publisher_uri');
+    var emailField = document.getElementById('field-publisher_email');
+    var typeField = document.getElementById('field-publisher_type');
+    var urlField = document.getElementById('field-publisher_url');
+
+    function updateFields() {
+        var selectedOption = dropdown.options[dropdown.selectedIndex];
+        if (selectedOption.value) {
+            uriField.value = selectedOption.getAttribute('data-uri');
+            emailField.value = selectedOption.getAttribute('data-email');
+            typeField.value = selectedOption.getAttribute('data-type');
+            urlField.value = selectedOption.getAttribute('data-url');
+        } else {
+            uriField.value = '';
+            emailField.value = '';
+            typeField.value = '';
+            urlField.value = '';
+        }
+    }
+
+    dropdown.addEventListener('change', updateFields);
+
+    // Trigger the change event to set initial values
+    updateFields();
+});		
