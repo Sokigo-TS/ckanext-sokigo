@@ -1,7 +1,7 @@
 {% asset 'sokigo/sokigo_js' %}
  
 <div class="form-group control-medium control-select">
-	<label class="form-label" for="field-Utgivare">{{ _("publisher") }}</label>
+	<label class="form-label" for="field-Utgivare">{{ _("Utgivare") }}</label>
 	<div class="controls">
 		<select id="field-Utgivare" name="Utgivare" class="form-control form-select">
 			<option value=""/>
@@ -14,6 +14,10 @@
                             data-url="{{publisher['url'] }}"
 			{% if existing_source_id==publisher['value' ] %}selected="selected" {% endif %}>{{ publisher['label']|safe }} </option> {% endfor %}
 		</select>
+		<div class="info-block ">
+               <i class="fa fa-info-circle"></i><font _mstmutation="1">
+                 Egenskapen hänvisar till en enhet (organisation) som ansvarar för att göra datamängden tillgänglig.
+                 </font></div>
               {% if error %}		<span class="error-block">{{ error }}</span>{% endif %}
 	</div>
 
@@ -27,4 +31,12 @@
     border-radius: 4px;
 }
 
+.info-block {
+    position: relative;
+    display: block;
+    font-size: 11px;
+    color: #6e6e6e;
+    line-height: 1.3;
+    margin-top: 6px;
+}
   </style>
