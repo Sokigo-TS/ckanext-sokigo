@@ -11,6 +11,8 @@ from ckan.types import Context, Schema, Validator, ValidatorFactory
 from ckanext.sokigo.copyhelper import copy_blueprint
 
 from ckanext.sokigo import copyhelper
+import ckan.model as model
+from ckan.model.domain_object import DomainObjectOperation
 
 log = logging.getLogger('ckanext.sokigo')
 
@@ -97,6 +99,37 @@ class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
     p.implements(p.ITemplateHelpers)
     p.implements(p.IDatasetForm, inherit=True)
     p.implements(p.IBlueprint)
+    p.implements(p.IDomainObjectModification, inherit=True)
+    p.implements(p.IPackageController, inherit=True)
+
+
+    def notify(self, entity, operation=None):
+        if not operation:
+            # This happens on IResourceURLChange
+            return
+
+        if not isinstance(entity, model.Package):
+            return
+        
+        params = {
+        "id": entity.id,
+        }
+        
+        package: dict[str, Any] = t.get_action("package_show")(
+            {
+                "ignore_auth": True,
+                "use_cache": False,
+                "validate": False,
+            },
+            params,
+        )
+        
+        if "state" in package and package["state"] == "draft":
+            t.enqueue_job(
+                              copyhelper.add_org_extras,
+                              [entity.id],
+                          )
+
       
     # IConfigurer
     def update_config(self, config_):
@@ -210,8 +243,5 @@ class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
         # This plugin doesn't handle any special package types, it just
         # registers itself as the default (above).
         return []
-
-
-    
-
+ 
     

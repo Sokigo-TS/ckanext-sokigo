@@ -38,6 +38,8 @@ copy_blueprint = Blueprint('copy', __name__, url_prefix='/dataset/copy')
 
 from urllib.parse import quote
 
+from ckan.lib.search import rebuild
+
 all_helpers = {}
 
 def helper(fn):
@@ -396,3 +398,111 @@ def get_publisher_from_json(selected):
 #            blueprint.add_url_rule(*rule)
 #
 #        return blueprint
+
+
+def add_org_extras(package_id:str):
+   
+    logger.info(package_id)
+
+    rebuild(package_id)
+
+    params = {
+                "id": package_id,
+            }
+            
+    datasetPackage: dict[str, Any] = t.get_action("package_show")({
+            "ignore_auth": True,
+            "use_cache": False,
+            "validate": False,
+        },params,)
+        
+    organization_id = datasetPackage["organization"]["id"]
+    
+    if not organization_id:
+        return 
+        
+    organization : dict[str, Any] = t.get_action("organization_show")({
+            "ignore_auth": True,
+            "use_cache": False,
+            "validate": False,
+        },{
+            "id": organization_id,
+        },)        
+    
+    new_extras_added = False
+    field_names_to_inherit = ckan_config.get('fields_inherit_from_organization')
+
+        
+    if field_names_to_inherit:
+        field_names_to_inherit = [field.strip() for field in field_names_to_inherit.split(',')]
+        logger.info(f'field name - {field_names_to_inherit}')
+        for field_to_add in field_names_to_inherit:
+            if field_to_add in organization:
+                value = get_field_value(datasetPackage, field_to_add)
+                logger.info(f'field name - {field_to_add} and value - {value}')
+                if not value or value == "[]" or value == "": 
+                    
+                    datasetPackage[field_to_add] = organization[field_to_add]
+                    new_extras_added = True
+                else:
+                    datasetPackage[field_to_add] = value                          
+        
+        
+        if 'extras' in organization:        
+            for organization_extra in organization["extras"]:
+                organization_extra_key = organization_extra['key']
+                organization_extra_value = organization_extra['value']
+                                
+                # Check if the key already exists in datasetPackage['extras']
+                key_exists = any(extra['key'] == organization_extra_key for extra in datasetPackage.get('extras', []))
+                
+                if not key_exists:
+                    new_extras_added = True
+                    # If the key doesn't exist, append the key-value pair to datasetPackage['extras']
+                    datasetPackage['extras'].append({'key': organization_extra_key, 'value': organization_extra_value})
+                    
+        
+        custom_metadata_fields = ckan_config.get('custom_metadata_fields')
+
+        logger.info(f'custom_metadata_fields -{custom_metadata_fields}')
+        
+        custom_metadata_fields = [field.strip() for field in custom_metadata_fields.split(',')]
+        
+        logger.info('updating package from org')
+        if new_extras_added:
+            if 'extras' in datasetPackage:
+                extras_list = datasetPackage['extras']
+                datasetPackage['extras'] = [item for item in extras_list if item.get('key')  not in custom_metadata_fields]
+            
+            t.get_action('package_update')({
+                    "ignore_auth": True,
+                    "use_cache": False,
+                    "validate": False,
+                }, datasetPackage)   
+            rebuild(package_id)  
+            
+            
+def get_field_value(package, field):
+    val = fetch_value_from_extras(package['extras'], field)
+    
+    val = val if val else package[field] if field in package else None
+    
+    return val     
+   
+
+def fetch_value_from_extras(extras_list, key):
+    for item in extras_list:
+        if item.get('key') == key:
+            return item.get('value')
+    return None            
+    
+@helper
+def get_custom_metadata_fields():
+
+    custom_metadata_fields = ckan_config.get('custom_metadata_fields')
+
+    # Set custom added metadata fields in package so that it can be syndicated.
+    if custom_metadata_fields:
+        custom_metadata_fields = [field.strip() for field in custom_metadata_fields.split(',')]  
+        return custom_metadata_fields
+    return None    

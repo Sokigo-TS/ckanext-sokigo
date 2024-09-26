@@ -1,15 +1,22 @@
-document.getElementById('openDataset').addEventListener('click', function () {
-    var selectedValue = document.getElementById('field-linked_dataset').value;
-    if (selectedValue) {
-        var baseUrl = 'https://' + window.location.hostname; // Get the base URL
-        var url = baseUrl + '/dataset/' + encodeURIComponent(selectedValue); // Construct the URL
-        var win = window.open(url, '_blank');
-        win.focus();
-    } else {
-        alert('Please select a dataset.');
-        return;
-    }
-});
+// Below code is used for opening the dataset from Goto button in dataset. Thsi will open the dataset into new window.
+
+ document.addEventListener('DOMContentLoaded', function () {
+	 var openDatasetButton = document.getElementById('openDataset');
+if (openDatasetButton) {
+    openDatasetButton.addEventListener('click', function () {
+        var selectedValue = document.getElementById('field-linked_dataset').value;
+        if (selectedValue) {
+            var baseUrl = 'https://' + window.location.hostname; // Get the base URL
+            var url = baseUrl + '/dataset/' + encodeURIComponent(selectedValue); // Construct the URL
+            var win = window.open(url, '_blank');
+            win.focus();
+        } else {
+            alert('Please select a dataset.');
+            return;
+        }
+    });
+} 
+ });
 
 // Below code is used for Publisher_Data.html file, when publisher is selected from drop down then show other read-only fields
 
