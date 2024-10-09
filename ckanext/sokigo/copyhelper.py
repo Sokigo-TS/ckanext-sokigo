@@ -505,4 +505,15 @@ def get_custom_metadata_fields():
     if custom_metadata_fields:
         custom_metadata_fields = [field.strip() for field in custom_metadata_fields.split(',')]  
         return custom_metadata_fields
-    return None    
+    return None  
+
+@helper
+def get_ordered_metadata_fields():
+
+    custom_metadata_fields = ckan_config.get('ordered_metadata_fields')
+
+    # Set custom added metadata fields in package so that it can be syndicated.
+    if custom_metadata_fields:
+        custom_metadata_fields = [field.strip() for field in custom_metadata_fields.split(',')]  
+        return custom_metadata_fields
+    return None      
