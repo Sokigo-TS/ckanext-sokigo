@@ -31,6 +31,14 @@
 
 {% block content_action %}
     {{ super() }}
+    
+    {% set user_is_sysadmin = h.check_access('sysadmin') %}
+ 
+    {%  if pkg.state == 'deleted' and user_is_sysadmin %}    
+    <a href="{{h.url_for('copy.UndeleteDataset', package_id=pkg.id)}}" class="btn btn-light"> <i class="fa fa-undo"></i> {{ _('Återställ') }}</a>
+     
+    {% endif %}
+
 
     {% if h.check_access('package_update', {'id':pkg.id }) %}
         <div class="dropdown btn-group">

@@ -517,3 +517,28 @@ def get_ordered_metadata_fields():
         custom_metadata_fields = [field.strip() for field in custom_metadata_fields.split(',')]  
         return custom_metadata_fields
     return None      
+
+@copy_blueprint.route('UndeleteDataset/<package_id>', methods=['GET', 'POST'])
+def UndeleteDataset(package_id):
+    params = {
+                "id": package_id,
+            }
+            
+    datasetPackage: dict[str, Any] = t.get_action("package_show")({
+            "ignore_auth": True,
+            "use_cache": False,
+            "validate": False,
+        },params,)
+    
+    datasetPackage["state"] = "active"
+    
+    t.get_action('package_update')({
+                    "ignore_auth": True,
+                    "use_cache": False,
+                    "validate": False,
+                }, datasetPackage)   
+    rebuild(package_id)  
+    
+    return t.redirect_to(f'/dataset/{datasetPackage["id"]}')
+
+     
