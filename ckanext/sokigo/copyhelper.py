@@ -532,6 +532,14 @@ def UndeleteDataset(package_id):
     
     datasetPackage["state"] = "active"
     
+    custom_metadata_fields = ckan_config.get('custom_metadata_fields')
+            
+    custom_metadata_fields = [field.strip() for field in custom_metadata_fields.split(',')]
+    
+    if 'extras' in datasetPackage:
+        extras_list = datasetPackage['extras']
+        datasetPackage['extras'] = [item for item in extras_list if item.get('key')  not in custom_metadata_fields]
+    
     t.get_action('package_update')({
                     "ignore_auth": True,
                     "use_cache": False,
