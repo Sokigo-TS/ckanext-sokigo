@@ -352,6 +352,19 @@ def get_dataset_title(dataset_id):
 @helper
 def get_publisher_from_json(selected):
     json_file_path = r'c:\app\src\ckan\publisher_data\publisherdata.json'
+    return get_drop_down_data_from_file(json_file_path, selected)
+    
+@helper
+def get_producer_from_json(selected):
+    json_file_path = r'c:\app\src\ckan\publisher_data\producerdata.json'
+    return get_drop_down_data_from_file(json_file_path, selected)
+
+@helper
+def get_maintainer_from_json(selected):
+    json_file_path = r'c:\app\src\ckan\publisher_data\maintainerdata.json'
+    return get_drop_down_data_from_file(json_file_path, selected)    
+
+def get_drop_down_data_from_file(json_file_path, selected):
 
     if not os.path.exists(json_file_path):
         return []

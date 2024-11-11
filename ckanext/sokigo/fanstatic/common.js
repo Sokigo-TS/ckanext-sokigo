@@ -21,7 +21,7 @@ if (openDatasetButton) {
 // Below code is used for Publisher_Data.html file, when publisher is selected from drop down then show other read-only fields
 
  document.addEventListener('DOMContentLoaded', function () {
-    var dropdown = document.getElementById('field-Utgivare');
+    var dropdown = document.getElementById('field-publisher_name');
     var uriField = document.getElementById('field-publisher_uri');
     var emailField = document.getElementById('field-publisher_email');
     var typeField = document.getElementById('field-publisher_type');
@@ -47,3 +47,68 @@ if (openDatasetButton) {
     // Trigger the change event to set initial values
     updateFields();
 });		
+
+// Below code is used for Publisher_Data.html file, when publisher is selected from drop down then show other read-only fields
+
+ document.addEventListener('DOMContentLoaded', function () {
+    var dropdown = document.getElementById('field-contact_name');
+	if (dropdown) {
+    var uriField = document.getElementById('field-contact_uri');
+    var emailField = document.getElementById('field-contact_email');
+    var typeField = document.getElementById('field-contact_type');
+    var urlField = document.getElementById('field-contact_url');
+
+    function updateFields() {
+        var selectedOption = dropdown.options[dropdown.selectedIndex];
+        if (selectedOption.value) {
+            uriField.value = selectedOption.getAttribute('data-uri');
+            emailField.value = selectedOption.getAttribute('data-email');
+            typeField.value = selectedOption.getAttribute('data-type');
+            urlField.value = selectedOption.getAttribute('data-url');
+        } else {
+            uriField.value = '';
+            emailField.value = '';
+            typeField.value = '';
+            urlField.value = '';
+        }
+    }
+
+    dropdown.addEventListener('change', updateFields);
+
+    // Trigger the change event to set initial values
+    updateFields();
+	}
+});		
+
+// Below code is used for Creator_Data.html file, when creator is selected from drop down then show other read-only fields
+
+ document.addEventListener('DOMContentLoaded', function () {
+    var dropdown = document.getElementById('field-creator_name');
+	if (dropdown) {
+    var uriField = document.getElementById('field-creator_uri');
+    var emailField = document.getElementById('field-creator_email');
+    var typeField = document.getElementById('field-creator_type');
+    var urlField = document.getElementById('field-creator_url');
+
+    function updateFields() {
+        var selectedOption = dropdown.options[dropdown.selectedIndex];
+        if (selectedOption.value) {
+            uriField.value = selectedOption.getAttribute('data-uri');
+            emailField.value = selectedOption.getAttribute('data-email');
+            typeField.value = selectedOption.getAttribute('data-type');
+            urlField.value = selectedOption.getAttribute('data-url');
+        } else {
+            uriField.value = '';
+            emailField.value = '';
+            typeField.value = '';
+            urlField.value = '';
+        }
+    }
+
+    dropdown.addEventListener('change', updateFields);
+
+    // Trigger the change event to set initial values
+    updateFields();
+	}
+});		
+

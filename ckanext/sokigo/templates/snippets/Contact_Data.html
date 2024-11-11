@@ -1,0 +1,42 @@
+{% asset 'sokigo/sokigo_js' %}
+ 
+<div class="form-group control-medium control-select">
+	<label class="form-label" for="field-contact_name">{{ _("Informationsförvaltare") }}</label>
+	<div class="controls">
+		<select id="field-contact_name" name="contact_name" class="form-control form-select">
+			<option value=""/>
+				 {% set existing_source_id = data.get('contact_name') %}
+                {% for maintainer in h.get_maintainer_from_json(data) %}
+			<option value="{{ maintainer['value'] }}" 
+			data-uri="{{maintainer['uri'] }}"
+                            data-email="{{ maintainer['email'] }}"
+                            data-type="{{maintainer['type'] }}"
+                            data-url="{{maintainer['url'] }}"
+			{% if existing_source_id==maintainer['value' ] %}selected="selected" {% endif %}>{{ maintainer['label']|safe }} </option> {% endfor %}
+		</select>
+		<div class="info-block ">
+               <i class="fa fa-info-circle"></i><font _mstmutation="1">
+                 Enhet (organisation) som aktivt förvaltar datamängden. Handhar ajourhållningsplaner m.m.
+                 </font></div>
+              {% if error %}		<span class="error-block">{{ error }}</span>{% endif %}
+	</div>
+
+</div>	
+  <style>
+/* Style for the details box */
+.details-box {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 4px;
+}
+
+.info-block {
+    position: relative;
+    display: block;
+    font-size: 11px;
+    color: #6e6e6e;
+    line-height: 1.3;
+    margin-top: 6px;
+}
+  </style>

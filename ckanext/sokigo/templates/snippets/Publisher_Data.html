@@ -1,11 +1,11 @@
 {% asset 'sokigo/sokigo_js' %}
  
 <div class="form-group control-medium control-select">
-	<label class="form-label" for="field-Utgivare">{{ _("Utgivare") }}</label>
+	<label class="form-label" for="field-publisher_name">{{ _("Utgivare") }}</label>
 	<div class="controls">
-		<select id="field-Utgivare" name="Utgivare" class="form-control form-select">
+		<select id="field-publisher_name" name="publisher_name" class="form-control form-select">
 			<option value=""/>
-				 {% set existing_source_id = data.get('Utgivare') %}
+				 {% set existing_source_id = data.get('publisher_name') %}
                 {% for publisher in h.get_publisher_from_json(data) %}
 			<option value="{{ publisher['value'] }}" 
 			data-uri="{{publisher['uri'] }}"
