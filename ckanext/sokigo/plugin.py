@@ -7,6 +7,7 @@ from ckan.lib.plugins import DefaultTranslation
 from flask import Blueprint
 from typing import Any, cast
 from ckan.types import Context, Schema, Validator, ValidatorFactory
+from six import text_type
 
 from ckanext.sokigo.copyhelper import copy_blueprint
 
@@ -102,6 +103,25 @@ class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
     p.implements(p.IDomainObjectModification, inherit=True)
     p.implements(p.IPackageController, inherit=True)
 
+    def update_config_schema(self, schema):
+
+        ignore_missing = t.get_validator('ignore_missing')
+        unicode_safe = t.get_validator('unicode_safe')
+
+        schema.update({
+           
+            # This is a custom configuration option
+            'ckan.site_spatial': [ignore_missing, unicode_safe],
+            'ckan.site_license': [ignore_missing, unicode_safe],
+            'ckan.site_publisher_name': [ignore_missing, unicode_safe],
+            'ckan.site_publisher_uri': [ignore_missing, unicode_safe],
+            'ckan.site_publisher_email': [ignore_missing, unicode_safe],
+            'ckan.site_publisher_url': [ignore_missing, unicode_safe],
+            'ckan.site_publisher_type': [ignore_missing, unicode_safe],
+            'ckan.site_issued': [ignore_missing, unicode_safe],
+        })
+
+        return schema
 
     def notify(self, entity, operation=None):
         if not operation:
@@ -244,4 +264,6 @@ class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
         # registers itself as the default (above).
         return []
  
+    def custom_config(self):
+        return 'sokigo/templates/admin/custom_config.html'
     

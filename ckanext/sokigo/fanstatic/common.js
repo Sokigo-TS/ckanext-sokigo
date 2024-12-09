@@ -22,6 +22,8 @@ if (openDatasetButton) {
 
  document.addEventListener('DOMContentLoaded', function () {
     var dropdown = document.getElementById('field-publisher_name');
+    if(dropdown)
+    {
     var uriField = document.getElementById('field-publisher_uri');
     var emailField = document.getElementById('field-publisher_email');
     var typeField = document.getElementById('field-publisher_type');
@@ -46,6 +48,7 @@ if (openDatasetButton) {
 
     // Trigger the change event to set initial values
     updateFields();
+}
 });		
 
 // Below code is used for Publisher_Data.html file, when publisher is selected from drop down then show other read-only fields

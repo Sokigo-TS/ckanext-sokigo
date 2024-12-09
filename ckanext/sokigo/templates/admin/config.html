@@ -1,0 +1,37 @@
+{% ckan_extends %}
+
+{% import 'macros/form.html' as form %}
+
+{% block admin_form %}
+
+  {{ super() }}
+
+
+  {{ form.input('ckan.site_spatial', id='field-ckan.site_spatial', label=_('Namngivet geografiskt område'), value=data['ckan.site_spatial'], error=errors['ckan.site_spatial']) }}
+  
+  {{ form.input('ckan.site_license', id='field-ckan.site_license', label=_('Licens'), value=data['ckan.site_license'], error=errors['ckan.site_license']) }}
+
+  {{ form.input('ckan.site_publisher_name', id='field-ckan.site_publisher_name', label=_('Utgivare'), value=data['ckan.site_publisher_name'], error=errors['ckan.site_publisher_name']) }}
+  {{ form.input('ckan.site_publisher_uri', id='field-ckan.site_publisher_uri', label=_('Utgivare URI'), value=data['ckan.site_publisher_uri'], error=errors['ckan.site_publisher_uri']) }}
+  {{ form.input('ckan.site_publisher_email', id='field-ckan.site_publisher_email', label=_('Utgivare e-post'), value=data['ckan.site_publisher_email'], error=errors['ckan.site_publisher_email']) }}
+  {{ form.input('ckan.site_publisher_url', id='field-ckan.site_publisher_url', label=_('Utgivare URL'), value=data['ckan.site_publisher_url'], error=errors['ckan.site_publisher_url']) }}
+  {{ form.input('ckan.site_publisher_type', id='field-ckan.site_publisher_type', label=_('Utgivare typ'), value=data['ckan.site_publisher_type'], error=errors['ckan.site_publisher_type']) }}
+
+  {{ form.input('ckan.site_issued', id='field-ckan.site_issued', label=_('Utgivningsdatum'), value=data['ckan.site_issued'], error=errors['ckan.site_issued']) }}
+
+
+{% endblock %}
+
+
+{% block admin_form_help %}
+
+  {{ super() }}
+
+
+  <p style="word-wrap: break-word;"><strong>Namngivet geografiskt område:</strong> Det geografiska området som omfattas av katalogen. Det rekommenderas att använda URI:er från Geonames i följande form: http://sws.geonames.org/6695072</p>
+  <p style="word-wrap: break-word;"><strong>Licens:</strong> DCAT-AP-SE kräver licensen CC0-1.0 (Public domain) på metadata i katalogen, dvs man ska använda URI:n http://creativecommons.org/publicdomain/zero/1.0/</p>
+  <p style="word-wrap: break-word;"><strong>Utgivare:</strong> Enhet (organisation) som ansvarar för att göra katalogen tillgänglig.</p>
+ 
+  <p style="word-wrap: break-word;"><strong>Utgivningsdatum:</strong> Katalogens utgivningsdatum</p>
+
+{% endblock %}
