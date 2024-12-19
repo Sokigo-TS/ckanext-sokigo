@@ -397,102 +397,89 @@ def get_drop_down_data_from_file(json_file_path, selected):
         # Handle cases where the file can't be read or is not a valid JSON
         return []
 
-#class CopyController(PackageController):
-#
-#    p.implements(p.IBlueprint)
-#
-#    def get_blueprint(self):
-#        blueprint = Blueprint('copy', self.__module__, url_prefix='/dataset/copy')
-#        rules = [
-#            ('/<id>/resources', 'copy_resources', copy_resources),
-#            ('/<id>', 'copy', copy),
-#        ]
-#        for rule in rules:
-#            blueprint.add_url_rule(*rule)
-#
-#        return blueprint
 
 
-def add_org_extras(package_id:str):
-   
-    logger.info(package_id)
-
-    rebuild(package_id)
-
-    params = {
-                "id": package_id,
-            }
+def add_org_extras(package_id, organization_id):
+    try:
+        logger.info("add org extras called")
+        logger.info(package_id)   
+               
+        organization : dict[str, Any] = t.get_action("organization_show")({
+                "ignore_auth": True,
+                "use_cache": False,
+                "validate": False,
+            },{
+                "id": organization_id,
+            },)        
+        
+        new_extras_added = False
+        field_names_to_inherit = ckan_config.get('fields_inherit_from_organization')
             
-    datasetPackage: dict[str, Any] = t.get_action("package_show")({
-            "ignore_auth": True,
-            "use_cache": False,
-            "validate": False,
-        },params,)
-        
-    organization_id = datasetPackage["organization"]["id"]
+        if field_names_to_inherit:
+            rebuild(package_id)
     
-    if not organization_id:
-        return 
-        
-    organization : dict[str, Any] = t.get_action("organization_show")({
-            "ignore_auth": True,
-            "use_cache": False,
-            "validate": False,
-        },{
-            "id": organization_id,
-        },)        
-    
-    new_extras_added = False
-    field_names_to_inherit = ckan_config.get('fields_inherit_from_organization')
-
-        
-    if field_names_to_inherit:
-        field_names_to_inherit = [field.strip() for field in field_names_to_inherit.split(',')]
-        logger.info(f'field name - {field_names_to_inherit}')
-        for field_to_add in field_names_to_inherit:
-            if field_to_add in organization:
-                value = get_field_value(datasetPackage, field_to_add)
-                logger.info(f'field name - {field_to_add} and value - {value}')
-                if not value or value == "[]" or value == "": 
-                    
-                    datasetPackage[field_to_add] = organization[field_to_add]
-                    new_extras_added = True
-                else:
-                    datasetPackage[field_to_add] = value                          
-        
-        
-        if 'extras' in organization:        
-            for organization_extra in organization["extras"]:
-                organization_extra_key = organization_extra['key']
-                organization_extra_value = organization_extra['value']
-                                
-                # Check if the key already exists in datasetPackage['extras']
-                key_exists = any(extra['key'] == organization_extra_key for extra in datasetPackage.get('extras', []))
+            params = {
+                    "id": package_id,
+                    }
                 
-                if not key_exists:
-                    new_extras_added = True
-                    # If the key doesn't exist, append the key-value pair to datasetPackage['extras']
-                    datasetPackage['extras'].append({'key': organization_extra_key, 'value': organization_extra_value})
-                    
-        
-        custom_metadata_fields = ckan_config.get('custom_metadata_fields')
-
-        logger.info(f'custom_metadata_fields -{custom_metadata_fields}')
-        
-        custom_metadata_fields = [field.strip() for field in custom_metadata_fields.split(',')]
-        
-        logger.info('updating package from org')
-        if new_extras_added:
-            if 'extras' in datasetPackage:
-                extras_list = datasetPackage['extras']
-                datasetPackage['extras'] = [item for item in extras_list if item.get('key')  not in custom_metadata_fields]
-            
-            t.get_action('package_update')({
+            datasetPackage: dict[str, Any] = t.get_action("package_show")({
                     "ignore_auth": True,
                     "use_cache": False,
                     "validate": False,
-                }, datasetPackage)   
-            rebuild(package_id)  
+                },params,)
+            
+            field_names_to_inherit = [field.strip() for field in field_names_to_inherit.split(',')]
+            logger.info(f'field name - {field_names_to_inherit}')
+            for field_to_add in field_names_to_inherit:
+                if field_to_add in organization:
+                    value = get_field_value(datasetPackage, field_to_add)
+                    logger.info(f'field name - {field_to_add} and value - {value}')
+                    if not value or value == "[]" or value == "": 
+                        
+                        datasetPackage[field_to_add] = organization[field_to_add]
+                        new_extras_added = True
+                    else:
+                        datasetPackage[field_to_add] = value                          
+            
+            
+            if 'extras' in organization:        
+                for organization_extra in organization["extras"]:
+                    organization_extra_key = organization_extra['key']
+                    organization_extra_value = organization_extra['value']
+                                    
+                    # Check if the key already exists in datasetPackage['extras']
+                    key_exists = any(extra['key'] == organization_extra_key for extra in datasetPackage.get('extras', []))
+                    
+                    if not key_exists:
+                        logger.info(f"key - {organization_extra_key} not exists in dataset. Adding")
+                        new_extras_added = True
+                        # If the key doesn't exist, append the key-value pair to datasetPackage['extras']
+                        datasetPackage['extras'].append({'key': organization_extra_key, 'value': organization_extra_value})
+                        
+            
+            custom_metadata_fields = ckan_config.get('custom_metadata_fields')
+    
+            logger.info(f'custom_metadata_fields -{custom_metadata_fields}')
+            
+            custom_metadata_fields = [field.strip() for field in custom_metadata_fields.split(',')]
+            
+            if new_extras_added:
+                logger.info('updating package')
+     
+                if 'extras' in datasetPackage:
+                    extras_list = datasetPackage['extras']
+                    datasetPackage['extras'] = [item for item in extras_list if item.get('key')  not in custom_metadata_fields]
+                
+                t.get_action('package_update')({
+                        "ignore_auth": True,
+                        "use_cache": False,
+                        "validate": False,
+                    }, datasetPackage)
+                
+                rebuild(package_id)
+                                            
+    except Exception as e:
+        return         
             
             
 def get_field_value(package, field):

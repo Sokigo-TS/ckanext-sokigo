@@ -8,12 +8,17 @@ from flask import Blueprint
 from typing import Any, cast
 from ckan.types import Context, Schema, Validator, ValidatorFactory
 from six import text_type
+from ckan.common import config as ckan_config
 
 from ckanext.sokigo.copyhelper import copy_blueprint
 
 from ckanext.sokigo import copyhelper
 import ckan.model as model
 from ckan.model.domain_object import DomainObjectOperation
+
+from ckan.lib.search import rebuild
+
+import ckan.logic as logic
 
 log = logging.getLogger('ckanext.sokigo')
 
@@ -102,6 +107,7 @@ class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
     p.implements(p.IBlueprint)
     p.implements(p.IDomainObjectModification, inherit=True)
     p.implements(p.IPackageController, inherit=True)
+    p.implements(p.IResourceController, inherit=True)
 
     def update_config_schema(self, schema):
 
@@ -122,33 +128,51 @@ class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
         })
 
         return schema
-
+    
+    def after_resource_create(self, context, res_dict):
+        try: 
+            log.info("after_resource_create called")
+            
+            params = {
+                "id": res_dict["package_id"],
+                }
+                
+            package: dict[str, Any] = t.get_action("package_show")(
+                {
+                    "ignore_auth": True,
+                    "use_cache": False,
+                    "validate": False,
+                },
+                params,
+            )
+            
+            organization_id = package["organization"]["id"]
+            
+            if not organization_id:
+                return 
+                    
+            if "state" in package and package["state"] == "draft":
+                copyhelper.add_org_extras(package["id"], organization_id)
+                
+        except Exception as e:
+            log.info(f"after_resource_create exception : {e}")
+            return    
+            
+    
     def notify(self, entity, operation=None):
-        if not operation:
-            # This happens on IResourceURLChange
-            return
-
-        if not isinstance(entity, model.Package):
-            return
-        
-        params = {
-        "id": entity.id,
-        }
-        
-        package: dict[str, Any] = t.get_action("package_show")(
-            {
-                "ignore_auth": True,
-                "use_cache": False,
-                "validate": False,
-            },
-            params,
-        )
-        
-        if "state" in package and package["state"] == "draft":
-            t.enqueue_job(
-                              copyhelper.add_org_extras,
-                              [entity.id],
-                          )
+        try:                   
+            if not operation:
+                # This happens on IResourceURLChange
+                return
+           
+            if not isinstance(entity, model.Package):
+                return
+            
+            
+            log.info("This method gets called on dataset change.")
+            
+        except Exception as e:
+            return    
 
       
     # IConfigurer
@@ -266,4 +290,6 @@ class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
  
     def custom_config(self):
         return 'sokigo/templates/admin/custom_config.html'
+    
+    
     
