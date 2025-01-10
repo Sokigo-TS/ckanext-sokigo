@@ -1,0 +1,112 @@
+{% asset 'sokigo/sokigo_js' %}
+
+<div class="form-group control-medium control-select">
+    <label class="form-label" for="field-{{ field['field_name'] }}">{{ h.scheming_language_text(field['label']) }}</label>
+    <div class="controls form-group control-medium">
+        <select id="field-{{ field['field_name'] }}" name="{{ field['field_name'] }}" class="form-control form-select">
+            <option value="" />
+
+            {% set fieldName = field['field_name'] %}
+            {% set existing_source_id = data.get(fieldName) %}
+            {% for dropDownField in h.scheming_field_choices(field) %}
+
+            <option value="{{ dropDownField['value'] }}" data-uri="{{dropDownField['uri'] }}"
+                data-email="{{ dropDownField['email'] }}" data-type="{{dropDownField['type'] }}"
+                data-url="{{dropDownField['url'] }}" {% if existing_source_id==dropDownField['value'] %}selected="selected" {% endif %}>
+                {{ dropDownField['label']|safe }}
+            </option>
+            {% endfor %}
+        </select>
+
+        {%- snippet 'scheming/form_snippets/help_text.html', field=field -%}
+
+        {% if error %}
+        <span class="error-block">{{ error }}</span>
+        {% endif %}
+    </div>
+</div>
+
+<div class="form-group control-full">
+    <label class="form-label" for="field-tag_string">{{ h.scheming_language_text(field['label'])}} {{ _(" Detaljer")
+        }}</label>
+    <div class="d-flex justify-content-between align-items-center" style="float: right;">
+        <button class="btn btn-sm btn-link text-decoration-none" type="button" data-bs-toggle="collapse"
+            data-bs-target="#{{ field['field_name'] }}Collapse" aria-expanded="true"
+            aria-controls="{{ field['field_name'] }}Collapse">
+            <span id="{{ field['field_name'] }}ArrowIcon" class="fa-solid fa-minus"
+                data-arrow-for="{{ field['field_name'] }}"></span>
+        </button>
+    </div>
+
+    <div class="border py-0 px-3 mb-3">
+
+        <div id="{{ field['field_name'] }}Collapse" class="collapse show mt-3" data-collapse-id="{{ field['field_name'] }}">
+
+            {% set schema = h.scheming_dataset_schemas(dataset_type) %}
+
+            {% set dataset_fields = schema.dataset.dataset_fields %}
+
+            {% for child in h.scheming_get_child_fields(field) %}
+            {% set childField = h.scheming_field_by_name(dataset_fields, child) %}
+
+            <div class="form-group control-medium">
+                <label class="form-label" for="field-{{child}}">{{ h.scheming_language_text(childField['label']) }}</label>
+                <div class="controls">
+                    <input id="field-{{child}}" type="text" name="{{child}}" placeholder="" class="form-control" readonly="True">
+                </div>
+            </div>
+
+            {% endfor %}
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Select all collapsible sections using data-collapse-id
+        const collapsibleSections = document.querySelectorAll('[data-collapse-id]');
+
+        collapsibleSections.forEach(section => {
+            // Get the field name from the data attribute
+            const fieldName = section.getAttribute('data-collapse-id');
+            const arrowIcon = document.querySelector(`#${fieldName}ArrowIcon`);
+
+            if (arrowIcon) {
+                // Add event listeners for show and hide collapse events
+                section.addEventListener('shown.bs.collapse', function () {
+                    arrowIcon.classList.remove('fa-plus');
+                    arrowIcon.classList.add('fa-minus');
+                });
+
+                section.addEventListener('hidden.bs.collapse', function () {
+                    arrowIcon.classList.remove('fa-minus');
+                    arrowIcon.classList.add('fa-plus');
+                });
+            }
+        });
+    });
+
+
+</script>
+
+<style>
+    /* Style for the details box */
+    .details-box {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-top: 10px;
+        border-radius: 4px;
+    }
+
+    .info-block {
+        position: relative;
+        display: block;
+        font-size: 11px;
+        color: #6e6e6e;
+        line-height: 1.3;
+        margin-top: 6px;
+    }
+</style>
