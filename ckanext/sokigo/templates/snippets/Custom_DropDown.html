@@ -33,14 +33,14 @@
         <button class="btn btn-sm btn-link text-decoration-none" type="button" data-bs-toggle="collapse"
             data-bs-target="#{{ field['field_name'] }}Collapse" aria-expanded="true"
             aria-controls="{{ field['field_name'] }}Collapse">
-            <span id="{{ field['field_name'] }}ArrowIcon" class="fa-solid fa-minus"
+            <span id="{{ field['field_name'] }}ArrowIcon" class="fa-solid fa-plus"
                 data-arrow-for="{{ field['field_name'] }}"></span>
         </button>
     </div>
 
     <div class="border py-0 px-3 mb-3">
 
-        <div id="{{ field['field_name'] }}Collapse" class="collapse show mt-3" data-collapse-id="{{ field['field_name'] }}">
+        <div id="{{ field['field_name'] }}Collapse" class="collapse mt-3" data-collapse-id="{{ field['field_name'] }}">
 
             {% set schema = h.scheming_dataset_schemas(dataset_type) %}
 
