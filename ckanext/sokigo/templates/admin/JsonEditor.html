@@ -1,0 +1,257 @@
+{% import 'macros/autoform.html' as autoform %}
+{% extends "admin/base.html" %}
+{% import 'macros/form.html' as form %}
+
+{% block primary_content_inner %}
+<div class="container">
+
+    <h1>Redigera Aktörlista</h1>
+
+    <!-- Error Alert -->
+    {% if error %}
+    <div class="alert alert-danger">
+        <strong>Fel:</strong> {{ error }}
+    </div>
+    {% endif %}
+
+    <!-- File Selection Dropdown -->
+    <form method="get">
+        <label for="file">Välj en Aktörlista:</label>
+        <select name="file" id="file" class="form-control form-select" onchange="this.form.submit()">
+            <option value="" />
+
+            {% for file in json_files %}
+            <option value="{{ file.file_name }}" {% if file.file_name==selected_file %}selected{% endif %}>
+                {{ file.display_name }}
+            </option>
+            {% endfor %}
+        </select>
+    </form>
+
+    <hr />
+
+    {% if selected_file %}
+
+    <form id="form_JsonEditor" method="post">
+        {% if json_data %}
+        {% for obj in json_data %}
+        <div class="json-row border p-3 mb-3">
+
+            <!-- Clickable Name Row with Arrow -->
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0" onclick="toggleRowDetails({{ loop.index0 }})" style="cursor: pointer;">{{ obj.name }}
+                </h5>
+
+                <span id="toggle_icon_{{ loop.index0 }}" onclick="toggleRowDetails({{ loop.index0 }})"
+                    style="cursor: pointer;">
+                    &#9654;
+                </span>
+            </div>
+
+            <!-- Hidden Details Section -->
+            <div id="row_details_{{ loop.index0 }}" class="row-details collapse mt-3">
+
+                <input type="hidden" name="id_{{ loop.index0 }}" class="form-control d-inline w-75"
+                    value="{{ obj.id }}">
+
+                <div class="mb-3 d-flex flex-wrap align-items-center justify-content-between">
+                    <label for="id_{{ loop.index0 }}" class="form-label fw-bold flex-grow-1">Namn:</label>
+                    <input readonly type="text" name="name_{{ loop.index0 }}" class="form-control d-inline w-75"
+                        value="{{ obj.name }}">
+                </div>
+
+                <div class="mb-3 d-flex flex-wrap align-items-center justify-content-between">
+                    <label for="uri_{{ loop.index0 }}" class="form-label fw-bold flex-grow-1">URI:</label>
+                    <input type="url" name="uri_{{ loop.index0 }}" class="form-control d-inline w-75"
+                        value="{{ obj.uri }}" required>
+                </div>
+
+                <div class="mb-3 d-flex flex-wrap align-items-center justify-content-between">
+                    <label for="email_{{ loop.index0 }}" class="form-label fw-bold flex-grow-1">E-postadress:</label>
+                    <input type="email" name="email_{{ loop.index0 }}" class="form-control d-inline w-75"
+                        value="{{ obj.email }}" required>
+                </div>
+
+                <div class="mb-3 d-flex flex-wrap align-items-center justify-content-between">
+                    <label for="type_{{ loop.index0 }}" class="form-label fw-bold">Typ:</label>
+                    <select name="type_{{ loop.index0 }}" class="form-control d-inline w-75 form-select">
+                        {% for label, uri in type_options.items() %}
+                        <option value="{{ uri }}" {% if obj.type==uri %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3 d-flex flex-wrap align-items-center justify-content-between">
+                    <label for="url_{{ loop.index0 }}" class="form-label fw-bold flex-grow-1">Hemsida:</label>
+                    <input type="url" name="url_{{ loop.index0 }}" class="form-control d-inline w-75"
+                        value="{{ obj.url }}" required>
+                </div>
+
+                <button type="button" class="btn btn-danger" onclick="removeRow(this)">Ta bort rad</button>
+            </div>
+
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <!-- Container for dynamically added rows -->
+        <div id="row-container"></div>
+
+        <button type="button" class="btn btn-secondary" onclick="addRow()">Lägg till ny rad</button>
+        <input type="hidden" name="objects_count" id="objects_count" value="{{ json_data|length }}" />
+
+        <button type="submit" class="btn btn-primary">Spara ändringar</button>
+    </form>
+
+
+    {% endif %}
+    <script>
+
+        let rowCounter = {{ json_data| length }};
+
+        //let typeOptions = {{ type_options | tojson | safe }};  // Backend sends dictionary
+
+        let typeOptions = {{ type_options.items() | list | tojson | safe }};
+        console.log(typeOptions);
+
+        //let optionsHtml = "";
+        // for (let [label, uri] of Object.entries(typeOptions)) {
+        //     optionsHtml += `<option value="${uri}">${label}</option>`;
+        // }
+
+        let firstKey = Object.keys(typeOptions)[0]; // Get first key to mark as selected
+
+        let optionsHtml = typeOptions
+            .map(([label, uri], index) => `<option value="${uri}" ${index === 0 ? "selected" : ""}>${label}</option>`)
+            .join("");
+
+        function toggleRowDetails(index) {
+            const detailsSection = document.getElementById(`row_details_${index}`);
+            const arrowIcon = document.getElementById(`toggle_icon_${index}`);
+
+            if (detailsSection.classList.contains("show")) {
+                detailsSection.classList.remove("show");
+                arrowIcon.innerHTML = "&#9654;"; // Right arrow
+            } else {
+                detailsSection.classList.add("show");
+                arrowIcon.innerHTML = "&#9660;"; // Down arrow
+            }
+        }
+
+        function addRow() {
+            const rowContainer = document.getElementById('row-container');
+
+            const container = document.createElement('div');
+            container.className = 'json-row border p-3 mb-3';
+
+            // Unique row index
+            const rowId = `new_row_${rowCounter}`;
+
+            container.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0" style="cursor: pointer;" onclick="toggleRowDetails(${rowCounter})">Ny rad</h5>
+                    <span id="toggle_icon_${rowId}" onclick="toggleRowDetails('${rowId}')" style="cursor: pointer;">
+                        &#9660; <!-- Down arrow by default, so new rows start expanded -->
+                    </span>
+                </div>
+
+                <div id="row_details_${rowId}" class="row-details collapse show mt-3">
+                    
+                    <input type="hidden" name="id_${rowCounter}" class="form-control d-inline w-75">
+
+                    <div class="mb-3 d-flex flex-wrap align-items-center justify-content-between">
+                        <label class="form-label fw-bold flex-grow-1">Namn:</label>
+                        <input type="text" name="name_${rowCounter}" oninput="validateUniqueName(this)" class="form-control d-inline w-75" required>
+
+                    </div>
+                    <div class="mb-3 d-flex flex-wrap align-items-center justify-content-between">
+                        <label class="form-label fw-bold flex-grow-1">URI:</label>
+                        <input type="url" name="uri_${rowCounter}" class="form-control d-inline w-75" required>
+                    </div>
+                    <div class="mb-3 d-flex flex-wrap align-items-center justify-content-between">
+                        <label class="form-label fw-bold flex-grow-1">E-postadress:</label>
+                        <input type="email" name="email_${rowCounter}" class="form-control d-inline w-75" required>
+                    </div>
+                    <div id="row_details_${rowId}" class="row-details collapse show mt-3">
+                    <div class="mb-3 d-flex flex-wrap align-items-center justify-content-between"">
+                        <label class="form-label fw-bold">Typ:</label>
+                        <select name="type_${rowCounter}" class="form-control d-inline w-75 form-select">${optionsHtml}</select>
+                    </div>
+                </div>
+                    
+                    <div class="mb-3 d-flex flex-wrap align-items-center justify-content-between">
+                        <label class="form-label fw-bold flex-grow-1">Hemsida:</label>
+                        <input type="url" name="url_${rowCounter}" class="form-control d-inline w-75" required>
+                    </div>
+
+                    <button type="button" class="btn btn-danger" onclick="removeRow(this)">Ta bort rad</button>
+                </div>
+            `;
+            rowContainer.appendChild(container);
+
+            rowCounter++;
+            document.getElementById('objects_count').value = rowCounter;
+        }
+
+        function removeRow(button) {
+            if (confirm("Are you sure you want to delete this record?")) {
+                // Remove row from DOM
+                const rowToRemove = button.closest('.json-row');
+                rowToRemove.remove();
+
+                // Reindex all remaining rows to avoid index mismatch when saving
+                const rows = document.querySelectorAll('.json-row'); // Get all remaining rows
+                rowCounter = rows.length; // Update row counter
+
+                // Loop through each row and reset name attributes 
+                rows.forEach((row, index) => {
+                    row.querySelector('[name^="name_"]').setAttribute('name', `name_${index}`);
+                    row.querySelector('[name^="id_"]').setAttribute('name', `id_${index}`);
+                    row.querySelector('[name^="uri_"]').setAttribute('name', `uri_${index}`);
+                    row.querySelector('[name^="email_"]').setAttribute('name', `email_${index}`);
+                    row.querySelector('[name^="type_"]').setAttribute('name', `type_${index}`);
+                    row.querySelector('[name^="url_"]').setAttribute('name', `url_${index}`);
+
+                    // Update the collapse section ID and toggle icon to ensure proper functionality
+                    row.querySelector('.row-details').setAttribute('id', `row_details_${index}`);
+                    row.querySelector('span[id^="toggle_icon_"]').setAttribute('id', `toggle_icon_${index}`);
+                    row.querySelector('span[id^="toggle_icon_"]').setAttribute('onclick', `toggleRowDetails(${index})`);
+                });
+
+                // Update hidden field value in form
+                document.getElementById('objects_count').value = rowCounter;
+            }
+        }
+
+        function validateUniqueName(input) {
+            let normalize = str => str.normalize("NFC").trim().replace(/\s+/g, ' ').toLowerCase();
+
+            let newName = normalize(input.value);
+            let allNames = Array.from(document.querySelectorAll('[name^="name_"]'))
+                .filter(el => el !== input)
+                .map(el => normalize(el.value));
+
+            if (allNames.includes(newName)) {
+                alert(`A record with the name "${newName}" already exists! Please use a unique name.`);
+                input.value = input.getAttribute("data-prev-value") || "";  // Restore previous value
+            } else {
+                input.setAttribute("data-prev-value", newName);  // Store latest valid value
+            }
+        }
+
+
+    </script>
+</div>
+{% endblock %}
+
+{% block secondary_content %}
+<div class="module module-narrow module-shallow">
+    <h2 class="module-heading">
+        <i class="fa fa-info-circle"></i>
+        {{ _("Aktörer") }}
+    </h2>
+    <div class="module-content">
+        <p>Redigera JSON-filer för utgivare, kontakt och skapare.</p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% ckan_extends %}
+
+{% import 'macros/form.html' as form %}
+
+{% block content_primary_nav %}
+
+  {{ super() }}
+
+  {{ h.build_nav_icon('ckan_admin.Editor', _('Aktörer'), icon='edit') }}
+
+{% endblock %}

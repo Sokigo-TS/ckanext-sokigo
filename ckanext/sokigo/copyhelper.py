@@ -14,7 +14,8 @@ from six import string_types, text_type
 
 import flask
 
-from flask import Blueprint
+from flask import Blueprint, jsonify, request
+
 import logging
 import json
 import requests
@@ -24,6 +25,13 @@ import ckan.model as model
 
 import json
 import os
+import ckan.lib.base as base
+
+from ckan.views.admin import admin as admin_blueprint
+
+from flask import Blueprint, render_template, request, redirect, url_for
+from ckan.plugins import SingletonPlugin, implements
+from ckan.plugins.toolkit import config
 
 from ckan.common import config as ckan_config
 
@@ -36,9 +44,15 @@ logger = logging.getLogger(__name__)
 
 copy_blueprint = Blueprint('copy', __name__, url_prefix='/dataset/copy')
 
+sysadmin_blueprint = Blueprint('ckan_admin', __name__, url_prefix='/ckan-admin/Editor')
+
 from urllib.parse import quote
 
 from ckan.lib.search import rebuild
+
+from ckan.common import _,  current_user
+from collections import OrderedDict
+
 
 all_helpers = {}
 
@@ -48,6 +62,18 @@ def helper(fn):
     """
     all_helpers[fn.__name__] = fn
     return fn
+
+@sysadmin_blueprint.before_request
+def before_request() -> None:
+    try:
+        context: Context = {
+            "user": current_user.name,
+            "auth_user_obj": current_user
+        }
+        l.check_access(u'sysadmin', context)
+    except l.NotAuthorized:
+        base.abort(403, _(u'Need to be system administrator to administer'))
+
 
 @copy_blueprint.route('/<id>/resources', methods=['GET','POST'])
 def copy_resources(id, data=None, errors=None, error_summary=None):
@@ -258,6 +284,97 @@ def copy(id):
                     'pkg_dict': data}
 
     return t.render(new_template, extra_vars=extra_vars)
+
+@sysadmin_blueprint.route('/', methods=['GET', 'POST'])  # Allow both GET and POST
+def Editor():
+    JSON_FILES_DIRECTORY = r'c:\app\src\ckan\publisher_data'
+
+    # File name to display name mapping
+    FILE_NAME_MAPPING = {
+        "publisherdata.json": "Utgivare",
+        "producerdata.json": "Informationsägare",
+        "maintainerdata.json": "Informationsförvaltare"
+    }
+
+    # Type options stored as a mapping of Name -> URI
+    TYPE_OPTIONS = OrderedDict([
+        ( "Lokal myndighet/kommun", "http://purl.org/adms/publishertype/LocalAuthority"),
+        ("Akademia/Vetenskaplig organisation", "http://purl.org/adms/publishertype/Academia-ScientificOrganisation"),
+        ("Företag", "http://purl.org/adms/publishertype/Company"),
+        ("Industrikonsortium", "http://purl.org/adms/publishertype/IndustryConsortium"),       
+        ( "Nationell myndighet", "http://purl.org/adms/publishertype/NationalAuthority"),
+        ("Icke-statlig organisation", "http://purl.org/adms/publishertype/NonGovernmentalOrganisation"),
+        ("Ej vinstdrivande organisation", "http://purl.org/adms/publishertype/NonProfitOrganisation"),
+        ("Privatperson(er)", "http://purl.org/adms/publishertype/PrivateIndividual(s)"),        
+        ("Regional myndighet/landsting", "http://purl.org/adms/publishertype/RegionalAuthority"),
+        ("Standardiseringsorganisation", "http://purl.org/adms/publishertype/NonProfitOrganisation"),
+        ("Över-/mellanstatlig myndighet", "http://purl.org/adms/publishertype/SupraNationalAuthority")
+    ])    
+                
+    # Ensure the directory for JSON files exists
+    if not os.path.exists(JSON_FILES_DIRECTORY):
+        os.makedirs(JSON_FILES_DIRECTORY)
+
+    # Get available JSON files & make them readable
+    json_files = [
+        {"file_name": f, "display_name": FILE_NAME_MAPPING.get(f, f)}  # Use mapping or raw filename if not found
+        for f in os.listdir(JSON_FILES_DIRECTORY) if f.endswith('.json')
+    ]
+
+    # Determine selected file
+    selected_file = request.args.get('file') if request.args.get('file') else None
+    json_data = None
+    error = None
+
+    # Load JSON file if selected
+    if selected_file:
+        selected_file_path = os.path.join(JSON_FILES_DIRECTORY, selected_file)
+        try:
+            with open(selected_file_path, 'r') as f:
+                json_data = json.load(f)
+        except json.JSONDecodeError:
+            error = f"Could not parse {selected_file} as valid JSON."
+        except Exception as e:
+            error = str(e)
+
+    ### **Handling the POST request for saving data**
+    if request.method == 'POST':
+        if selected_file:
+            selected_file_path = os.path.join(JSON_FILES_DIRECTORY, selected_file)
+            objects_count = int(request.form.get('objects_count', 0))
+            rows = []
+
+            # Construct JSON object from form fields
+            for i in range(objects_count):
+                row = {
+                    'id': request.form.get(f'id_{i}', ''),
+                    'name': request.form.get(f'name_{i}', ''),
+                    'uri': request.form.get(f'uri_{i}', ''),
+                    'email': request.form.get(f'email_{i}', ''),
+                    'type': request.form.get(f'type_{i}', ''),
+                    'url': request.form.get(f'url_{i}', ''),
+                }
+                rows.append(row)
+
+            # Save updated JSON back to file
+            try:
+                with open(selected_file_path, 'w') as f:
+                    json.dump(rows, f, indent=4)
+                
+                # Redirect to prevent form resubmission issues
+                return redirect(url_for('.Editor', file=selected_file))
+            except Exception as e:
+                error = str(e)
+
+    return render_template(
+        'admin/JsonEditor.html',
+        json_files=json_files,
+        selected_file=selected_file,
+        json_data=json_data or [],
+        error=error,
+        type_options=TYPE_OPTIONS 
+    )   
+
 
 def _guess_package_type(expecting_name=False):
     """
