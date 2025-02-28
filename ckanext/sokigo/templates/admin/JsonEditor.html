@@ -236,6 +236,12 @@
                 input.value = input.getAttribute("data-prev-value") || "";  // Restore previous value
             } else {
                 input.setAttribute("data-prev-value", newName);  // Store latest valid value
+                // Update hidden ID field with the name value
+                let rowIndex = input.name.split('_')[1]; // Extract row index from name attribute
+                let hiddenIdInput = document.querySelector(`[name="id_${rowIndex}"]`);
+                if (hiddenIdInput) {
+                    hiddenIdInput.value = newName;  // Sync name to hidden ID field
+                }
             }
         }
 

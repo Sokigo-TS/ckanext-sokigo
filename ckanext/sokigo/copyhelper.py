@@ -34,6 +34,7 @@ from ckan.plugins import SingletonPlugin, implements
 from ckan.plugins.toolkit import config
 
 from ckan.common import config as ckan_config
+import ckan.lib.jobs as jobs
 
 tuplize_dict = l.tuplize_dict
 clean_dict = l.clean_dict
@@ -53,6 +54,10 @@ from ckan.lib.search import rebuild
 from ckan.common import _,  current_user
 from collections import OrderedDict
 
+from ckanext.scheming.helpers import (
+    scheming_dataset_schemas, scheming_get_dataset_schema,
+   scheming_field_by_name , scheming_get_child_fields
+    )
 
 all_helpers = {}
 
@@ -288,13 +293,24 @@ def copy(id):
 @sysadmin_blueprint.route('/', methods=['GET', 'POST'])  # Allow both GET and POST
 def Editor():
     JSON_FILES_DIRECTORY = r'c:\app\src\ckan\publisher_data'
-
-    # File name to display name mapping
-    FILE_NAME_MAPPING = {
+    
+    FILE_NAME_MAPPING = ckan_config.get('file_name_mapping')
+    
+    if FILE_NAME_MAPPING:
+        FILE_NAME_MAPPING= json.loads(FILE_NAME_MAPPING)
+    else:
+        FILE_NAME_MAPPING = {
         "publisherdata.json": "Utgivare",
         "producerdata.json": "Informationsägare",
         "maintainerdata.json": "Informationsförvaltare"
-    }
+        }
+            
+    
+    FIELD_NAME_MAPPING = ckan_config.get('field_name_mapping')
+    if FIELD_NAME_MAPPING:
+        FIELD_NAME_MAPPING = json.loads(FIELD_NAME_MAPPING)
+    else:
+        FIELD_NAME_MAPPING = { "publisherdata.json": "publisher_name", "producerdata.json": "creator_name", "maintainerdata.json": "contact_name" }    
 
     # Type options stored as a mapping of Name -> URI
     TYPE_OPTIONS = OrderedDict([
@@ -360,6 +376,14 @@ def Editor():
             try:
                 with open(selected_file_path, 'w') as f:
                     json.dump(rows, f, indent=4)
+                
+                fieldName = FIELD_NAME_MAPPING.get(selected_file, None)
+                
+                if fieldName and selected_file_path:
+                    t.enqueue_job(
+                                    add_background_job_for_update_datasets,
+                                    [selected_file_path, fieldName],
+                                )
                 
                 # Redirect to prevent form resubmission issues
                 return redirect(url_for('.Editor', file=selected_file))
@@ -666,4 +690,85 @@ def UndeleteDataset(package_id):
     
     return t.redirect_to(f'/dataset/{datasetPackage["id"]}')
 
-     
+
+def add_background_job_for_update_datasets(json_path, fieldName):
+    
+    # Load JSON data
+    with open(json_path, 'r', encoding='utf-8') as f:
+        json_data = json.load(f)
+
+    logger.info(f"Fetching datasets")
+    
+    # Fetch all datasets
+    datasets = t.get_action('package_list')( {
+            "ignore_auth": True,
+            "use_cache": False,
+            "validate": False,
+        })
+    
+    logger.info(f"Getting dataset schema")
+
+    schema = scheming_dataset_schemas() 
+        
+    # Extract dataset
+    dataset = schema.get('dataset', {})
+
+    # Extract dataset fields
+    dataset_fields = dataset.get('dataset_fields', [])
+    
+    for dataset in datasets:       
+        update_datasets_for_drop_down_fields(dataset, json_data, fieldName, dataset_fields)
+        
+
+def update_datasets_for_drop_down_fields(dataset, json_data, field_name, dataset_fields):
+    logger.info(f"update_datasets_for_drop_down_fields executed for dataset - {dataset} and field name - {field_name}")
+        
+    json_lookup = {item['id']: item for item in json_data}    
+    
+    json_lookup.update({item['name']: item for item in json_data if 'name' in item and item['name']})
+    
+    field = scheming_field_by_name(dataset_fields, field_name)  
+                
+    custom_metadata_fields = ckan_config.get('custom_metadata_fields')
+    custom_metadata_fields = [field.strip() for field in custom_metadata_fields.split(',')]
+
+    try:
+        datasetDetails = t.get_action('package_show')( {
+                    "ignore_auth": True,
+                    "use_cache": False,
+                    "validate": False,
+                }, {'id': dataset})
+                
+        dropDownValue = get_field_value(datasetDetails ,field_name)
+        if dropDownValue and dropDownValue in json_lookup:
+            
+            # Fetch matching node from JSON
+            matching_node = json_lookup[dropDownValue]
+            
+            logger.info(f"matching_node : {matching_node}")
+            
+            datasetDetails[field_name] = matching_node.get('id')
+
+            # Iterate over child fields
+            for child in scheming_get_child_fields(field):
+                logger.info(f"child field - {child}")
+                
+                json_value = matching_node.get(child.split('_')[-1])  # Get value from JSON
+                dataset_value = get_field_value(datasetDetails ,child) 
+                
+                datasetDetails[child] = json_value                                  
+                
+            logger.info('updating package')
+    
+            if 'extras' in datasetDetails:
+                extras_list = datasetDetails['extras']
+                datasetDetails['extras'] = [item for item in extras_list if item.get('key')  not in custom_metadata_fields]
+                            
+            t.get_action('package_update')({
+                    "ignore_auth": True,
+                    "use_cache": False,
+                    "validate": False,
+                }, datasetDetails)
+    except Exception as e:
+        logger.error(f"Error processing dataset {dataset}: {str(e)}")  
+      

@@ -115,3 +115,34 @@ if (openDatasetButton) {
 	}
 });		
 
+
+//Generate GUId Button click on package_form.html in scheming plugin for generating GUId and assigning to last extra filed input box
+document.addEventListener('DOMContentLoaded', function () {
+  document.getElementById("generate-guid-btn").addEventListener("click", function() {
+
+    // Generate a new GUID
+      function generateGUID() {
+          return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+              var r = Math.random() * 16 | 0, v = c === 'x' ? r : (c === 'y' ? (r & 0x3 | 0x8) : r);
+              return v.toString(16);
+          });
+      }
+
+      let newGUID = generateGUID();
+
+      // Find all inputs that match the pattern "field-extras-*-value"
+      let valueInputs = document.querySelectorAll("input[id^='field-extras-'][id$='-value']");
+
+      if (valueInputs.length > 0) {
+          // Sort inputs based on their numeric index (e.g., field-extras-6-value)
+          let sortedInputs = Array.from(valueInputs).sort((a, b) => {
+              let numA = parseInt(a.id.match(/\d+/)[0], 10);
+              let numB = parseInt(b.id.match(/\d+/)[0], 10);
+              return numA - numB;
+          });
+
+          let lastInput = sortedInputs[sortedInputs.length - 1]; // Select the last input field
+          lastInput.value = newGUID;
+      }
+  });
+});
