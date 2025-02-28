@@ -130,19 +130,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       let newGUID = generateGUID();
 
-      // Find all inputs that match the pattern "field-extras-*-value"
-      let valueInputs = document.querySelectorAll("input[id^='field-extras-'][id$='-value']");
-
-      if (valueInputs.length > 0) {
-          // Sort inputs based on their numeric index (e.g., field-extras-6-value)
-          let sortedInputs = Array.from(valueInputs).sort((a, b) => {
-              let numA = parseInt(a.id.match(/\d+/)[0], 10);
-              let numB = parseInt(b.id.match(/\d+/)[0], 10);
-              return numA - numB;
-          });
-
-          let lastInput = sortedInputs[sortedInputs.length - 1]; // Select the last input field
-          lastInput.value = newGUID;
-      }
+      spanGUID = document.getElementById('span_GUID')
+      spanGUID.textContent  = newGUID; 
   });
 });
