@@ -118,19 +118,43 @@ if (openDatasetButton) {
 
 //Generate GUId Button click on package_form.html in scheming plugin for generating GUId and assigning to last extra filed input box
 document.addEventListener('DOMContentLoaded', function () {
-  document.getElementById("generate-guid-btn").addEventListener("click", function() {
-
-    // Generate a new GUID
-      function generateGUID() {
-          return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-              var r = Math.random() * 16 | 0, v = c === 'x' ? r : (c === 'y' ? (r & 0x3 | 0x8) : r);
-              return v.toString(16);
+    const generateBtn = document.getElementById("generate-guid-btn");
+  
+    if (generateBtn) {
+      generateBtn.addEventListener("click", function () {
+  
+        function generateGUID() {
+          return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0,
+                v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
           });
-      }
-
-      let newGUID = generateGUID();
-
-      spanGUID = document.getElementById('span_GUID')
-      spanGUID.textContent  = newGUID; 
+        }
+  
+        let newGUID = generateGUID();
+  
+        const spanGUID = document.getElementById('span_GUID');
+        if (spanGUID) {
+          spanGUID.textContent = newGUID;
+        }
+      });
+    }
   });
-});
+  
+// This adds a scroll-bar in mapview when map contains multiple layer. The map when viewed at bottom in a resource.
+const iframe = document.querySelector('iframe');
+
+if(iframe){
+    iframe.onload = function () {
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+      
+        const style = iframeDoc.createElement('style');
+        style.textContent = `
+          .ol-unselectable.ol-control.layer-list {
+            max-height: 300px !important;
+            overflow-y: auto !important;
+          }
+        `;
+        iframeDoc.head.appendChild(style);
+      };
+}
