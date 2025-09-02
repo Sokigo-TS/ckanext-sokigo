@@ -14,7 +14,8 @@ from six import string_types, text_type
 
 import flask
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, send_file
+import tempfile
 
 import logging
 import json
@@ -45,7 +46,7 @@ logger = logging.getLogger(__name__)
 
 copy_blueprint = Blueprint('copy', __name__, url_prefix='/dataset/copy')
 
-sysadmin_blueprint = Blueprint('ckan_admin', __name__, url_prefix='/ckan-admin/Editor')
+sysadmin_blueprint = Blueprint('ckan_admin', __name__, url_prefix='/ckan-admin')
 
 from urllib.parse import quote
 
@@ -772,3 +773,30 @@ def update_datasets_for_drop_down_fields(dataset, json_data, field_name, dataset
     except Exception as e:
         logger.error(f"Error processing dataset {dataset}: {str(e)}")  
       
+      
+@sysadmin_blueprint.route('/download_package/<package_id>', methods=['GET', 'POST'])  # Allow both GET and POST      
+def download_package(package_id):
+    """
+    Download a dataset package as JSON file using internal CKAN action API.
+    """
+    try:
+        context = {'model': model, 'session': model.Session, 'ignore_auth': True}
+        package_show = t.get_action('package_show')
+        result = package_show(context, {'id': package_id})
+
+        # Write result to a temporary file
+        with tempfile.NamedTemporaryFile(mode='w+', encoding='utf-8', suffix='.json', delete=False) as tmp_file:
+            json.dump(result, tmp_file, indent=2, ensure_ascii=False)
+            tmp_file_path = tmp_file.name
+
+        # Serve file as download
+        return send_file(
+            tmp_file_path,
+            mimetype='application/json',
+            as_attachment=True,
+            download_name=f"{result['name']}.json"
+        )
+    except t.ObjectNotFound:
+        return f"Package with ID '{package_id}' not found.", 404
+    except Exception as e:
+        return f"Error: {str(e)}", 500   

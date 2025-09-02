@@ -39,6 +39,8 @@
      
     {% endif %}
 
+    <a href="{{h.url_for('ckan_admin.download_package', package_id=pkg.id)}}" class="btn btn-light"> <i class="fa fa-download"></i> {{ _('Ladda ner') }}</a>
+
 
     {% if h.check_access('package_update', {'id':pkg.id }) %}
         <div class="dropdown btn-group">
