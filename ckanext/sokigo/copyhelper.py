@@ -291,7 +291,7 @@ def copy(id):
 
     return t.render(new_template, extra_vars=extra_vars)
 
-@sysadmin_blueprint.route('/', methods=['GET', 'POST'])  # Allow both GET and POST
+@sysadmin_blueprint.route('/actors', methods=['GET', 'POST'])  # Allow both GET and POST
 def Editor():
     JSON_FILES_DIRECTORY = r'c:\app\src\ckan\publisher_data'
     
