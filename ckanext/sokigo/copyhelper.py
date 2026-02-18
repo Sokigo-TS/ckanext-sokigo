@@ -37,6 +37,9 @@ from ckan.plugins.toolkit import config
 from ckan.common import config as ckan_config
 import ckan.lib.jobs as jobs
 
+from ckan.logic import ValidationError
+
+
 tuplize_dict = l.tuplize_dict
 clean_dict = l.clean_dict
 parse_params = l.parse_params
@@ -47,6 +50,12 @@ logger = logging.getLogger(__name__)
 copy_blueprint = Blueprint('copy', __name__, url_prefix='/dataset/copy')
 
 sysadmin_blueprint = Blueprint('ckan_admin', __name__, url_prefix='/ckan-admin')
+
+dataset_resources_blueprint = Blueprint(
+    'dataset_resources',
+    __name__,
+    url_prefix='/dataset'
+)
 
 from urllib.parse import quote
 
@@ -800,3 +809,16 @@ def download_package(package_id):
         return f"Package with ID '{package_id}' not found.", 404
     except Exception as e:
         return f"Error: {str(e)}", 500   
+    
+    
+@dataset_resources_blueprint.route('/<id>/resources')
+def resources(id):
+    # Reuse CKAN core logic to render the dataset page
+    return t.render(
+        'package/resources.html',
+        extra_vars={
+            'pkg_dict': t.get_action('package_show')(
+                {}, {'id': id}
+            )
+        }
+    )    
