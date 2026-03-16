@@ -1,0 +1,96 @@
+{% extends "admin/base.html" %}
+
+{% block primary_content_inner %}
+<div class="container">
+
+<h1>hantera alternativ för flervalsfält</h1>
+
+<form method="get">
+  <label>Fält</label>
+  <select name="field" onchange="this.form.submit()">
+    <option value="">-- Välja --</option>
+    {% for f in fields %}
+      <option value="{{ f }}" {% if f == selected %}selected{% endif %}>
+        {{ f }}
+      </option>
+    {% endfor %}
+  </select>
+</form>
+
+{% if selected %}
+<hr>
+
+<form method="post" id="controlled-list-form">
+
+  <!-- Existing values -->
+  <label>Befintliga värden</label>
+  <ul id="value-list" class="list-group"
+      style="max-height:300px; overflow-y:auto; margin-bottom:15px;">
+  </ul>
+
+  <!-- Add new value -->
+  <label>Lägg till nytt värde</label>
+  <div class="input-group" style="margin-bottom:15px;">
+    <textarea id="new-value" class="form-control" rows="2"
+      placeholder="Enter new value"></textarea>
+    <button type="button" class="btn btn-secondary" onclick="addValue()">
+      Tillägga
+    </button>
+  </div>
+
+  <!-- Hidden JSON payload -->
+  <textarea name="values" id="values-json" hidden></textarea>
+
+  <button class="btn btn-primary">Spara</button>
+</form>
+
+<script>
+  // Initial data from backend
+  let values = {{ values|safe }};
+
+  function renderList() {
+    const list = document.getElementById('value-list');
+    list.innerHTML = '';
+
+    values.forEach((v, i) => {
+      const li = document.createElement('li');
+      li.className = 'list-group-item d-flex justify-content-between align-items-center';
+
+      li.innerHTML = `
+        <span>${v}</span>
+        <button type="button" class="btn btn-sm btn-danger"
+          onclick="removeValue(${i})">✕</button>
+      `;
+      list.appendChild(li);
+    });
+
+    document.getElementById('values-json').value = JSON.stringify(values);
+  }
+
+  function addValue() {
+    const input = document.getElementById('new-value');
+    const value = input.value.trim();
+
+    if (!value) return;
+
+    if (!values.includes(value)) {
+      values.push(value);
+      renderList();
+    }
+
+    input.value = '';
+  }
+
+  function removeValue(index) {
+    values.splice(index, 1);
+    renderList();
+  }
+
+  // Initial render
+  renderList();
+</script>
+
+{% endif %}
+
+</div>
+{% endblock %}

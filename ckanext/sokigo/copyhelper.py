@@ -51,6 +51,8 @@ copy_blueprint = Blueprint('copy', __name__, url_prefix='/dataset/copy')
 
 sysadmin_blueprint = Blueprint('ckan_admin', __name__, url_prefix='/ckan-admin')
 
+nonadmin_blueprint = Blueprint('ckan_nonadmin', __name__, url_prefix='/')
+
 dataset_resources_blueprint = Blueprint(
     'dataset_resources',
     __name__,
@@ -783,7 +785,7 @@ def update_datasets_for_drop_down_fields(dataset, json_data, field_name, dataset
         logger.error(f"Error processing dataset {dataset}: {str(e)}")  
       
       
-@sysadmin_blueprint.route('/download_package/<package_id>', methods=['GET', 'POST'])  # Allow both GET and POST      
+@nonadmin_blueprint.route('/download_package/<package_id>', methods=['GET', 'POST'])  # Allow both GET and POST      
 def download_package(package_id):
     """
     Download a dataset package as JSON file using internal CKAN action API.
@@ -822,3 +824,124 @@ def resources(id):
             )
         }
     )    
+
+    
+@helper
+def controlled_list_choices(field):
+    field_name = field.get('field_name')
+    data = load_controlled_lists()
+
+    raw = data.get(field_name)
+    if not isinstance(raw, list):
+        return []
+
+    choices = []
+
+    for item in raw:
+        if isinstance(item, str):
+            value = item.strip()
+            if value:
+                choices.append({'value': value, 'label': value})
+
+        elif isinstance(item, dict):
+            value = item.get('value')
+            label = item.get('label', value)
+            if value:
+                choices.append({'value': value, 'label': label})
+
+    return choices
+
+
+
+
+
+
+@sysadmin_blueprint.route('/ControlledLists', methods=['GET', 'POST'])
+def ControlledLists():
+    fields = _allowed_fields()
+    selected = request.args.get('field')
+
+    data = load_controlled_lists()
+
+    if request.method == 'POST' and selected in fields:
+        values = json.loads(request.form['values'])
+        data[selected] = values
+        _save_controlled_lists(data)
+
+        return redirect(url_for('.ControlledLists', field=selected))
+
+    return t.render(
+        'admin/controlled_lists.html',
+        extra_vars={
+            'fields': fields,
+            'selected': selected,
+            'values': json.dumps(data.get(selected, []), indent=2)
+        }
+    )
+
+  
+def get_or_create_controlled_lists(allowed_fields):
+    ctx = {'ignore_auth': True}
+
+    try:
+        data = l.get_action('config_option_show')(
+            ctx, {'key': 'controlled_lists'}
+        )
+    except ValidationError:
+        # Runtime creation
+        data = {f: [] for f in allowed_fields}
+        l.get_action('config_option_update')(
+            ctx,
+            {'key': 'controlled_lists', 'value': data}
+        )
+
+    return data    
+
+def _controlled_lists_path():
+    return 'c:/app/src/ckan/drop_down_fields_data/MultiSelect_Lists.json' 
+
+def _allowed_fields():
+    return ckan_config.get('controlled_lists_fields', '').split()
+
+def load_controlled_lists():
+    fields = _allowed_fields()
+    path = _controlled_lists_path()
+
+    logger.info(f'allowed fields - {fields}')
+    logger.info(f'allowed path - {path}')
+
+    if not path:
+        return {f: [] for f in fields}
+
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+
+    # File does not exist → create
+    if not os.path.exists(path):
+        data = {f: [] for f in fields}
+        _save_controlled_lists(data, path)
+        return data
+
+    # Load file
+    with open(path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+
+    changed = False
+
+    # Add missing fields dynamically
+    for f in fields:
+        if f not in data:
+            data[f] = []
+            changed = True
+
+    # Optional: remove obsolete fields
+    # data = {k: v for k, v in data.items() if k in fields}
+
+    if changed:
+        _save_controlled_lists(data, path)
+
+    return data
+
+def _save_controlled_lists(data, path=None):
+    path = path or _controlled_lists_path()
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)

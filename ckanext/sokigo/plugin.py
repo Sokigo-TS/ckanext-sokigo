@@ -10,7 +10,7 @@ from ckan.types import Context, Schema, Validator, ValidatorFactory
 from six import text_type
 from ckan.common import config as ckan_config
 
-from ckanext.sokigo.copyhelper import copy_blueprint, sysadmin_blueprint, dataset_resources_blueprint
+from ckanext.sokigo.copyhelper import copy_blueprint, sysadmin_blueprint, dataset_resources_blueprint, nonadmin_blueprint
 
 from ckanext.sokigo import copyhelper
 import ckan.model as model
@@ -188,7 +188,7 @@ class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
 
     def get_blueprint(self):
 
-        return [copy_blueprint, sysadmin_blueprint, dataset_resources_blueprint]
+        return [copy_blueprint, sysadmin_blueprint, dataset_resources_blueprint, nonadmin_blueprint]
         # rules = [
             # ('/<id>/resources', 'copy_resources', copyhelper.copy_resources),
             # ('/<id>', 'copy', copyhelper.copy),
