@@ -10,10 +10,11 @@
   <select name="field" onchange="this.form.submit()">
     <option value="">-- Välja --</option>
     {% for f in fields %}
-      <option value="{{ f }}" {% if f == selected %}selected{% endif %}>
-        {{ f }}
-      </option>
-    {% endfor %}
+  <option value="{{ f.value }}"
+    {% if f.value == selected %}selected{% endif %}>
+    {{ f.label }}
+  </option>
+{% endfor %}
   </select>
 </form>
 

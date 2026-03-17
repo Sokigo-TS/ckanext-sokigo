@@ -14,7 +14,7 @@ from six import string_types, text_type
 
 import flask
 
-from flask import Blueprint, jsonify, request, send_file
+from flask import Blueprint, jsonify, request, send_file, abort
 import tempfile
 
 import logging
@@ -38,7 +38,8 @@ from ckan.common import config as ckan_config
 import ckan.lib.jobs as jobs
 
 from ckan.logic import ValidationError
-
+from ckanext.scheming.helpers import scheming_get_dataset_schema
+from ckan.lib.helpers import lang
 
 tuplize_dict = l.tuplize_dict
 clean_dict = l.clean_dict
@@ -858,12 +859,20 @@ def controlled_list_choices(field):
 
 @sysadmin_blueprint.route('/ControlledLists', methods=['GET', 'POST'])
 def ControlledLists():
+    field_names = _allowed_field_names()
     fields = _allowed_fields()
+
     selected = request.args.get('field')
+
+    if selected not in field_names:
+        selected = None
 
     data = load_controlled_lists()
 
-    if request.method == 'POST' and selected in fields:
+    if request.method == 'POST':
+        if selected not in field_names:
+            abort(403)  # extra safety
+
         values = json.loads(request.form['values'])
         data[selected] = values
         _save_controlled_lists(data)
@@ -875,7 +884,7 @@ def ControlledLists():
         extra_vars={
             'fields': fields,
             'selected': selected,
-            'values': json.dumps(data.get(selected, []), indent=2)
+            'values': json.dumps(data.get(selected, []) if selected else [],indent=2)
         }
     )
 
@@ -900,41 +909,55 @@ def get_or_create_controlled_lists(allowed_fields):
 def _controlled_lists_path():
     return 'c:/app/src/ckan/drop_down_fields_data/MultiSelect_Lists.json' 
 
-def _allowed_fields():
+def _allowed_field_names():
     return ckan_config.get('controlled_lists_fields', '').split()
 
+
+def _allowed_fields():
+    allowed = _allowed_field_names()
+
+    # Get default dataset type
+    dataset_type = ckan_config.get('ckan.default_dataset_type', 'dataset')
+
+    schema = scheming_get_dataset_schema(dataset_type)
+
+    fields = []
+
+    for f in schema.get('dataset_fields', []):
+        name = f.get('field_name')
+
+        if name in allowed:
+            label = f.get('label')
+
+            # Handle multilingual label
+            if isinstance(label, dict):
+                label = label.get(lang(), name)
+
+            fields.append({
+                'value': name,
+                'label': label or name
+            })
+
+    return fields
+
 def load_controlled_lists():
-    fields = _allowed_fields()
+    field_names = _allowed_field_names()
     path = _controlled_lists_path()
 
-    logger.info(f'allowed fields - {fields}')
-    logger.info(f'allowed path - {path}')
-
-    if not path:
-        return {f: [] for f in fields}
-
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-
-    # File does not exist → create
     if not os.path.exists(path):
-        data = {f: [] for f in fields}
+        data = {f: [] for f in field_names}
         _save_controlled_lists(data, path)
         return data
 
-    # Load file
     with open(path, 'r', encoding='utf-8') as f:
         data = json.load(f)
 
     changed = False
 
-    # Add missing fields dynamically
-    for f in fields:
+    for f in field_names:
         if f not in data:
             data[f] = []
             changed = True
-
-    # Optional: remove obsolete fields
-    # data = {k: v for k, v in data.items() if k in fields}
 
     if changed:
         _save_controlled_lists(data, path)
