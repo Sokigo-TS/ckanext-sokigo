@@ -359,7 +359,7 @@ def Editor():
     if selected_file:
         selected_file_path = os.path.join(JSON_FILES_DIRECTORY, selected_file)
         try:
-            with open(selected_file_path, 'r') as f:
+            with open(selected_file_path, 'r', encoding='utf-8') as f:
                 json_data = json.load(f)
         except json.JSONDecodeError:
             error = f"Could not parse {selected_file} as valid JSON."
@@ -387,8 +387,8 @@ def Editor():
 
             # Save updated JSON back to file
             try:
-                with open(selected_file_path, 'w') as f:
-                    json.dump(rows, f, indent=4)
+                with open(selected_file_path, 'w', encoding='utf-8') as f:
+                    json.dump(rows, f, indent=4, ensure_ascii=False)
                 
                 fieldName = FIELD_NAME_MAPPING.get(selected_file, None)
                 

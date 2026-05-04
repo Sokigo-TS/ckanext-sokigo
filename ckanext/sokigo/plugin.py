@@ -19,7 +19,7 @@ from ckan.model.domain_object import DomainObjectOperation
 from ckan.lib.search import rebuild
 
 import ckan.logic as logic
-
+import json
 log = logging.getLogger('ckanext.sokigo')
 
 # SAML2 mapping by name: AD-group name must match organization name.
@@ -99,6 +99,31 @@ def saml2_mapping_by_list(saml_info):
     return result
 
 
+FOLDER_PATH = r"c:\app\src\ckan\publisher_data"
+
+def publisherdata_list(context, data_dict):
+        files = [
+            f for f in os.listdir(FOLDER_PATH)
+            if f.endswith(".json")
+        ]
+        return {"files": files}
+
+def publisherdata_get(context, data_dict):
+    filename = data_dict.get("filename")
+    if not filename:
+        raise t.ValidationError({"filename": ["Missing filename"]})
+    # Prevent path traversal
+    safe_path = os.path.normpath(os.path.join(FOLDER_PATH, filename))
+    if not safe_path.startswith(FOLDER_PATH):
+        raise t.ValidationError({"filename": ["Invalid filename"]})
+    if not os.path.exists(safe_path):
+        raise t.ObjectNotFound("File not found")
+    with open(safe_path, "r", encoding='utf-8') as f:
+        return json.load(f)
+
+publisherdata_list.side_effect_free = True
+publisherdata_get.side_effect_free = True
+
 class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
     p.implements(p.IConfigurer)
     p.implements(p.ITranslation)
@@ -108,7 +133,13 @@ class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
     p.implements(p.IDomainObjectModification, inherit=True)
     p.implements(p.IPackageController, inherit=True)
     p.implements(p.IResourceController, inherit=True)
+    p.implements(p.IActions)
 
+    def get_actions(self):
+        return {
+            "publisherdata_list": publisherdata_list,
+            "publisherdata_get": publisherdata_get
+        }
     def update_config_schema(self, schema):
 
         ignore_missing = t.get_validator('ignore_missing')
