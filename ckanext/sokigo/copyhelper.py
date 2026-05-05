@@ -814,15 +814,19 @@ def download_package(package_id):
         return f"Error: {str(e)}", 500   
     
     
-@dataset_resources_blueprint.route('/<id>/resources')
-def resources(id):
-    # Reuse CKAN core logic to render the dataset page
+@dataset_resources_blueprint.route('/<id>/resources-tab')
+def resources_tab(id):
+    # Dedicated read-mode resources tab (do not collide with core /resources edit route)
+    pkg = t.get_action('package_show')({}, {'id': id})
+    dataset_type = pkg.get('type') or ckan_config.get('ckan.default_dataset_type', 'dataset')
+    
     return t.render(
-        'package/resources.html',
+        'package/resource_list.html',
         extra_vars={
-            'pkg_dict': t.get_action('package_show')(
-                {}, {'id': id}
-            )
+            'pkg': pkg,
+            'pkg_dict': pkg,
+            'pkg_name': pkg.get('name'),
+            'dataset_type': dataset_type,
         }
     )    
 

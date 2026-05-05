@@ -1,6 +1,8 @@
 {% extends "package/read_base.html" %}
 
 {% block primary_content_inner %}
+  {% set pkg = pkg or pkg_dict %}
+
   {% snippet "package/snippets/resources_list.html",
       pkg=pkg,
       resources=pkg.resources,
