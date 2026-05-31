@@ -144,7 +144,7 @@ def copy_resources(id, data=None, errors=None, error_summary=None):
                 if attr in resource:
                     del resource[attr]
 
-        c.resources_json = h.json.dumps(resources)
+        c.resources_json = h.json.dumps(resources, ensure_ascii=False)
 
         # convert tags if not supplied in data
         if data and not data.get('tag_string'):
@@ -182,7 +182,7 @@ def copy_resources(id, data=None, errors=None, error_summary=None):
         except t.ValidationError as e:
             data['state'] = 'none'
             c.data = data
-            c.errors_json = h.json.dumps(e.error_dict)
+            c.errors_json = h.json.dumps(e.error_dict, ensure_ascii=False)
             form_vars = {'data': data, 'errors': e.error_dict,
                             'error_summary': e.error_summary,
                             'action': 'new', 'stage': data['state'],
@@ -202,7 +202,7 @@ def copy_resources(id, data=None, errors=None, error_summary=None):
     logger.info("Dictionary: %s", json.dumps(data, indent=2))
  
     c.data = data
-    c.errors_json = h.json.dumps(errors)
+    c.errors_json = h.json.dumps(errors, ensure_ascii=False)
     
     form_vars = {'data': data, 'errors': errors or {},
                      'error_summary': error_summary or {},
@@ -264,7 +264,7 @@ def copy(id):
 
     data = data or clean_dict(dict_fns.unflatten(tuplize_dict(parse_params(
         t.request.args, ignore_keys=CACHE_PARAMETERS))))
-    c.resources_json = h.json.dumps(data.get('resources', []))
+    c.resources_json = h.json.dumps(data.get('resources', []), ensure_ascii=False)
 
     # convert tags if not supplied in data
     if data and not data.get('tag_string'):
@@ -288,7 +288,7 @@ def copy(id):
                     'action': 'new', 'stage': stage,
                     'dataset_type': package_type, }
 
-    c.errors_json = h.json.dumps({})
+    c.errors_json = h.json.dumps({}, ensure_ascii=False)
 
     # override form action to use built-in package controller
     c.form_action = t.url_for('dataset.new')
@@ -888,7 +888,7 @@ def ControlledLists():
         extra_vars={
             'fields': fields,
             'selected': selected,
-            'values': json.dumps(data.get(selected, []) if selected else [],indent=2)
+            'values': json.dumps(data.get(selected, []) if selected else [],indent=2, ensure_ascii=False)
         }
     )
 
