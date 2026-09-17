@@ -22,7 +22,7 @@
 <hr>
 
 <form method="post" id="controlled-list-form">
-
+  {{ h.csrf_input() }}
   <!-- Existing values -->
   <label>Befintliga värden</label>
   <ul id="value-list" class="list-group"

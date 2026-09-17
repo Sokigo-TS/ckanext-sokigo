@@ -158,3 +158,11 @@ if(iframe){
         iframeDoc.head.appendChild(style);
       };
 }
+
+// The below code is used for setting the width of the scheming pages dynamic width field.
+document.querySelectorAll('.scheming-pages-dynamic-width').forEach(function (el) {
+  var w = el.getAttribute('data-width');
+  if (w) {
+    el.style.width = w + '%';
+  }
+});

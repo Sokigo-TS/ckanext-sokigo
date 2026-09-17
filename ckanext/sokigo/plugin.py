@@ -20,6 +20,9 @@ from ckan.lib.search import rebuild
 
 import ckan.logic as logic
 import json
+import ckan.authz as authz
+
+
 log = logging.getLogger('ckanext.sokigo')
 
 # SAML2 mapping by name: AD-group name must match organization name.
@@ -124,6 +127,21 @@ def publisherdata_get(context, data_dict):
 publisherdata_list.side_effect_free = True
 publisherdata_get.side_effect_free = True
 
+def site_read(context, data_dict=None):
+    """Restore the `site_read` auth function removed in CKAN 2.12 and
+    restrict it to sysadmins only.
+
+    - No @auth_allow_anonymous_access decorator, so CKAN rejects
+      unauthenticated users automatically before this body runs.
+    - Body limits success to sysadmins, so any non-admin logged-in
+      user is also denied.
+
+    Any extension that calls check_access('site_read', context)
+    (e.g. ckanext-editor) is covered by this single registration.
+    """
+    user = context.get('user')
+    return {'success': authz.is_sysadmin(user)}
+
 class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
     p.implements(p.IConfigurer)
     p.implements(p.ITranslation)
@@ -134,6 +152,12 @@ class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
     p.implements(p.IPackageController, inherit=True)
     p.implements(p.IResourceController, inherit=True)
     p.implements(p.IActions)
+    p.implements(p.IAuthFunctions)
+
+    # -- IAuthFunctions: register site_read globally
+    def get_auth_functions(self):
+        return {'site_read': site_read}
+    
 
     def get_actions(self):
         return {
