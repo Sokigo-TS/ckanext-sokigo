@@ -32,6 +32,7 @@
     {% if selected_file %}
 
     <form id="form_JsonEditor" method="post" >
+        {{ h.csrf_input() }}
         {% if json_data %}
         {% for obj in json_data %}
         <div class="json-row border p-3 mb-3">
@@ -164,12 +165,12 @@
                 input.addEventListener("blur", e => validateUnicodeEmail(e.target));
                 
                 // Validate initial value
-                validateUnicodeEmail(input);
+                validateUnicodeEmail(input); 
             });
         });
         
         // --- Form submission validation ---
-        document.getElementById("form_JsonEditor").addEventListener("submit", function(e) {
+        document.getElementById("form_JsonEditor")?.addEventListener("submit", function(e) {
             let isValid = true;
             const emailInputs = document.querySelectorAll('.email-input:not([disabled])');
             

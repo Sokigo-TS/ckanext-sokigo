@@ -18,6 +18,8 @@ from flask import Blueprint, jsonify, request, send_file, abort
 import tempfile
 
 import logging
+
+log = logging.getLogger(__name__)
 import json
 import requests
 import base64
@@ -343,6 +345,17 @@ def Editor():
     # Ensure the directory for JSON files exists
     if not os.path.exists(JSON_FILES_DIRECTORY):
         os.makedirs(JSON_FILES_DIRECTORY)
+
+    # Ensure the publisher, producer and maintainer files always exist (empty list by default)
+    default_files = {"publisherdata.json", "producerdata.json", "maintainerdata.json"}
+    for default_file in default_files | set(FILE_NAME_MAPPING):
+        default_path = os.path.join(JSON_FILES_DIRECTORY, default_file)
+        if not os.path.exists(default_path):
+            try:
+                with open(default_path, 'w', encoding='utf-8') as f:
+                    json.dump([], f)
+            except OSError as e:
+                log.error("Could not create %s: %s", default_path, e)
 
     # Get available JSON files & make them readable
     json_files = [
