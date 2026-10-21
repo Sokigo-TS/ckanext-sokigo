@@ -124,6 +124,34 @@ def publisherdata_get(context, data_dict):
     with open(safe_path, "r", encoding='utf-8') as f:
         return json.load(f)
 
+def publisherdata_create(context, data_dict):
+    """Append a single entry to an actors JSON file (sysadmin only).
+
+    Used to mirror entries created in the actors editor on another server.
+    Does nothing if an entry with the same id/name already exists.
+    """
+    if not authz.is_sysadmin(context.get('user')):
+        raise t.NotAuthorized("Need to be system administrator")
+    filename = data_dict.get("filename")
+    entry = data_dict.get("entry")
+    if not filename or not isinstance(entry, dict):
+        raise t.ValidationError({"filename/entry": ["Missing filename or entry"]})
+    safe_path = os.path.normpath(os.path.join(FOLDER_PATH, filename))
+    if os.path.dirname(safe_path) != os.path.normpath(FOLDER_PATH) or not filename.endswith(".json"):
+        raise t.ValidationError({"filename": ["Invalid filename"]})
+
+    rows = []
+    if os.path.exists(safe_path):
+        with open(safe_path, "r", encoding="utf-8") as f:
+            rows = json.load(f)
+    key = entry.get("id") or entry.get("name")
+    if any((r.get("id") or r.get("name")) == key for r in rows):
+        return {"created": False}
+    rows.append({k: entry.get(k, "") for k in ("id", "name", "uri", "email", "type", "url")})
+    with open(safe_path, "w", encoding="utf-8") as f:
+        json.dump(rows, f, indent=4, ensure_ascii=False)
+    return {"created": True}
+
 publisherdata_list.side_effect_free = True
 publisherdata_get.side_effect_free = True
 
@@ -162,7 +190,8 @@ class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
     def get_actions(self):
         return {
             "publisherdata_list": publisherdata_list,
-            "publisherdata_get": publisherdata_get
+            "publisherdata_get": publisherdata_get,
+            "publisherdata_create": publisherdata_create
         }
     def update_config_schema(self, schema):
 

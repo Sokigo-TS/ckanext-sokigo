@@ -305,6 +305,32 @@ def copy(id):
 
     return t.render(new_template, extra_vars=extra_vars)
 
+# create actor entry into external CKAN (pushds profile)
+def _push_actor_to_external(file_name, entry):
+    """Create a newly added actor entry on the external CKAN (pushds profile).
+
+    Failures are logged but never block the local save.
+    """
+    base_url = (ckan_config.get('ckanext.syndicate.profile.pushds.ckan_url')
+                or os.environ.get('CKANEXT__SYNDICATE__PROFILE__PUSHDS__CKAN_URL'))
+    api_key = (ckan_config.get('ckanext.syndicate.profile.pushds.api_key')
+               or os.environ.get('CKANEXT__SYNDICATE__PROFILE__PUSHDS__API_KEY'))
+    if not base_url or not api_key:
+        log.warning("pushds CKAN_URL/API_KEY not configured; skipping external actor creation")
+        return
+    try:
+        response = requests.post(
+            base_url.rstrip('/') + '/api/3/action/publisherdata_create',
+            json={'filename': file_name, 'entry': entry},
+            headers={'Authorization': api_key},
+            timeout=30,
+        )
+        if response.status_code != 200:
+            log.error("External actor creation failed (%s): %s", response.status_code, response.text)
+    except Exception as e:
+        log.error("External actor creation error for %s: %s", entry.get('name'), e)
+
+
 @sysadmin_blueprint.route('/actors', methods=['GET', 'POST'])  # Allow both GET and POST
 def Editor():
     JSON_FILES_DIRECTORY = r'c:\app\src\ckan\publisher_data'
@@ -398,11 +424,23 @@ def Editor():
                 }
                 rows.append(row)
 
+            # Work out which entries are new before overwriting the file
+            existing_keys = set()
+            try:
+                with open(selected_file_path, 'r', encoding='utf-8') as f:
+                    existing_keys = {(r.get('id') or r.get('name')) for r in json.load(f)}
+            except Exception:
+                pass
+            new_rows = [r for r in rows if (r['id'] or r['name']) not in existing_keys]
+
             # Save updated JSON back to file
             try:
                 with open(selected_file_path, 'w', encoding='utf-8') as f:
                     json.dump(rows, f, indent=4, ensure_ascii=False)
-                
+
+                for new_row in new_rows:
+                    _push_actor_to_external(selected_file, new_row)
+
                 fieldName = FIELD_NAME_MAPPING.get(selected_file, None)
                 
                 if fieldName and selected_file_path:
