@@ -21,6 +21,8 @@ from ckan.lib.search import rebuild
 import ckan.logic as logic
 import json
 import ckan.authz as authz
+from ckan.config.declaration import Declaration, Key
+import ckan.lib.app_globals as app_globals
 
 
 log = logging.getLogger('ckanext.sokigo')
@@ -170,6 +172,23 @@ def site_read(context, data_dict=None):
     user = context.get('user')
     return {'success': authz.is_sysadmin(user)}
 
+# Admin logo not updated correctly in CKAN 2.12, restore 2.11 behavior
+@t.chained_action
+def config_option_update(original_action, context, data_dict):
+    """CKAN 2.12 saves an uploaded site logo as a bare filename when the
+    legacy uploader is used. Restore the 2.11 behaviour: /uploads/admin/<file>."""
+    data = original_action(context, data_dict)
+
+    logo = data.get("ckan.site_logo")
+    if logo and not logo.startswith(("http", "/")):
+        logo = t.h.url_for_static("uploads/admin/" + logo)
+        model.set_system_info("ckan.site_logo", logo)
+        ckan_config["ckan.site_logo"] = logo
+        app_globals.set_app_global("ckan.site_logo", logo)
+        data["ckan.site_logo"] = logo
+
+    return data
+
 class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
     p.implements(p.IConfigurer)
     p.implements(p.ITranslation)
@@ -181,6 +200,14 @@ class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
     p.implements(p.IResourceController, inherit=True)
     p.implements(p.IActions)
     p.implements(p.IAuthFunctions)
+    p.implements(p.IConfigDeclaration)       
+
+    def declare_config_options(self, declaration: Declaration, key: Key): 
+        declaration.declare_list(key.ckan.upload.admin.types, ["image"])
+        declaration.declare_list(
+            key.ckan.upload.admin.mimetypes,
+            ["image/png", "image/gif", "image/jpeg"],
+        )
 
     # -- IAuthFunctions: register site_read globally
     def get_auth_functions(self):
@@ -191,8 +218,10 @@ class SokigoPlugin(p.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
         return {
             "publisherdata_list": publisherdata_list,
             "publisherdata_get": publisherdata_get,
-            "publisherdata_create": publisherdata_create
+            "publisherdata_create": publisherdata_create,
+            "config_option_update": config_option_update
         }
+    
     def update_config_schema(self, schema):
 
         ignore_missing = t.get_validator('ignore_missing')
