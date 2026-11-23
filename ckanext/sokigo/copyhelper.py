@@ -639,9 +639,10 @@ def add_org_extras(package_id, organization_id):
                 if field_to_add in organization:
                     value = get_field_value(datasetPackage, field_to_add)
                     logger.info(f'field name - {field_to_add} and value - {value}')
-                    if not value or value == "[]" or value == "": 
-                        
-                        datasetPackage[field_to_add] = organization[field_to_add]
+                    org_value = organization[field_to_add]
+                    # Inherit only when the dataset field is blank and the organization has a value
+                    if (not value or value == "[]") and org_value and org_value != "[]":
+                        datasetPackage[field_to_add] = org_value
                         new_extras_added = True
                     else:
                         datasetPackage[field_to_add] = value                          
@@ -671,10 +672,8 @@ def add_org_extras(package_id, organization_id):
             if new_extras_added:
                 logger.info('updating package')
      
-                if 'extras' in datasetPackage:
-                    extras_list = datasetPackage['extras']
-                    datasetPackage['extras'] = [item for item in extras_list if item.get('key')  not in custom_metadata_fields]
-                
+                move_custom_fields_out_of_extras(datasetPackage, custom_metadata_fields)
+
                 t.get_action('package_update')({
                         "ignore_auth": True,
                         "use_cache": False,
@@ -682,11 +681,50 @@ def add_org_extras(package_id, organization_id):
                     }, datasetPackage)
                 
                 rebuild(package_id)
-                                            
+
     except Exception as e:
-        return         
+        logger.exception(f'add_org_extras failed for package {package_id}: {e}')
+        return
             
             
+def move_custom_fields_out_of_extras(package, custom_metadata_fields):
+    """Move custom metadata fields from the package's extras to top-level keys.
+
+    With validate=False, package_show returns scheming fields only inside
+    'extras'. They must leave 'extras' before package_update (a schema field
+    and an extra with the same name clash), but dropping them would delete
+    their values, so keep each one as a top-level key instead. A top-level
+    value that is already set (e.g. inherited from the organization) wins.
+
+    Multi-value fields are stored as JSON strings such as '["a", "b"]'. They
+    are decoded back to lists, because package_update validates them again
+    and the scheming validators reject the raw string as one unknown choice.
+    """
+    if 'extras' not in package:
+        return
+
+    kept_extras = []
+    for item in package['extras']:
+        key = item.get('key')
+        if key in custom_metadata_fields:
+            package.setdefault(key, decode_json_list(item.get('value')))
+        else:
+            kept_extras.append(item)
+    package['extras'] = kept_extras
+
+
+def decode_json_list(value):
+    """Return a JSON-encoded list string as a list; any other value unchanged."""
+    if isinstance(value, str) and value.startswith('[') and value.endswith(']'):
+        try:
+            decoded = json.loads(value)
+        except ValueError:
+            return value
+        if isinstance(decoded, list):
+            return decoded
+    return value
+
+
 def get_field_value(package, field):
     val = fetch_value_from_extras(package['extras'], field)
     
@@ -741,10 +779,8 @@ def UndeleteDataset(package_id):
             
     custom_metadata_fields = [field.strip() for field in custom_metadata_fields.split(',')]
     
-    if 'extras' in datasetPackage:
-        extras_list = datasetPackage['extras']
-        datasetPackage['extras'] = [item for item in extras_list if item.get('key')  not in custom_metadata_fields]
-    
+    move_custom_fields_out_of_extras(datasetPackage, custom_metadata_fields)
+
     t.get_action('package_update')({
                     "ignore_auth": True,
                     "use_cache": False,
@@ -824,10 +860,8 @@ def update_datasets_for_drop_down_fields(dataset, json_data, field_name, dataset
                 
             logger.info('updating package')
     
-            if 'extras' in datasetDetails:
-                extras_list = datasetDetails['extras']
-                datasetDetails['extras'] = [item for item in extras_list if item.get('key')  not in custom_metadata_fields]
-                            
+            move_custom_fields_out_of_extras(datasetDetails, custom_metadata_fields)
+
             t.get_action('package_update')({
                     "ignore_auth": True,
                     "use_cache": False,
